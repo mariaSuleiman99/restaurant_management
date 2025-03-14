@@ -16,13 +16,13 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->boolean("force_update");
+            $table->boolean("force_update")->default(false);
             $table->enum("status",["Active","Inactive"]);
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->foreignIdFor(Role::class)->constrained();
-            $table->foreignIdFor(Restaurant::class);
+            $table->foreignIdFor(Restaurant::class)->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
