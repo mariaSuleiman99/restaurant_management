@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Restaurant;
+use App\Models\Table;
 use App\Models\User;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -17,6 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
         Restaurant::factory(10)->create(); //should be removed when uploaded to PROD
+        Table::factory(10)->create(); //should be removed when uploaded to PROD
         $this->call(RoleSeeder::class);
         User::factory()->create([
             'name' => 'System Admin',

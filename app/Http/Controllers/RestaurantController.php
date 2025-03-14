@@ -106,4 +106,5 @@ class RestaurantController extends Controller
         // Return success response
         return ResponseHelper::success("Restaurant deleted successfully.");
     }
+
 }
