@@ -20,7 +20,7 @@ class RestaurantController extends Controller
         $restaurants = Restaurant::all();
 
         // Return success response with the list of restaurants
-        return ResponseHelper::success("Restaurants retrieved successfully.", $restaurants);
+        return ResponseHelper::success("Restaurants retrieved successfully.",null, $restaurants);
     }
 
     /**

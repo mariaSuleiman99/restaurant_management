@@ -15,12 +15,13 @@ class ResponseHelper
      * @param int $statusCode
      * @return JsonResponse
      */
-    public static function success(string $message = "Success", $data = null, int $statusCode = 200): JsonResponse
+    public static function success(string $message = "Success", mixed $model = null, $list = null, int $statusCode = 200): JsonResponse
     {
         return response()->json([
             'status' => 'success',
             'message' => $message,
-            'data' => $data,
+            'model' => $model,
+            'list' => $list,
         ], $statusCode);
     }
 
@@ -44,7 +45,7 @@ class ResponseHelper
     /**
      * Handle Validation Errors
      *
-     * @param \Illuminate\Support\MessageBag $errors
+     * @param MessageBag $errors
      * @param int $statusCode
      * @return JsonResponse
      */

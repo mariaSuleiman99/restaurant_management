@@ -9,7 +9,7 @@ class OrderItem extends Model
 {
     protected $fillable = [
         'count',
-        'price'
+        'price','item_id','order_id'
     ];
     function items(): HasMany
     {

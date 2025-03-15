@@ -20,8 +20,7 @@ class TableController extends Controller
     public function index(): JsonResponse
     {
         $tables = Table::all();
-        $tables = $tables==null ? [] : $tables;
-        return ResponseHelper::success("Tables retrieved successfully.", $tables);
+        return ResponseHelper::success("Tables retrieved successfully.",null, $tables);
     }
 
     /**
@@ -108,6 +107,6 @@ class TableController extends Controller
         }
 
         // Return success response with the list of tables
-        return ResponseHelper::success("Tables retrieved successfully.", $tables);
+        return ResponseHelper::success("Tables retrieved successfully.",null, $tables);
     }
 }
