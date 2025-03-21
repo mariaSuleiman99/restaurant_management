@@ -30,7 +30,7 @@ return new class extends Migration
             $table->integer("count");
             $table->float("price");
             $table->foreignIdFor(Item::class)->constrained();
-            $table->foreignIdFor(Order::class)->constrained();
+            $table->foreignIdFor(Order::class)->nullable()->constrained();
             $table->timestamps();
         });
     }

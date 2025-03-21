@@ -86,4 +86,24 @@ class OrderItemController extends Controller
         $orderItem->delete();
         return ResponseHelper::success("Order item deleted successfully.");
     }
+    /**
+     * Get all order items for a specific order.
+     *
+     * @param int $orderId
+     * @return JsonResponse
+     */
+    public function getByOrderId(int $orderId): JsonResponse
+    {
+        // Option 1: Using a query scope
+        $orderItems = OrderItem::byOrderId($orderId);
+
+        // Option 2: Using a static method
+        // $orderItems = OrderItem::getByOrderId($orderId);
+
+        if ($orderItems->isEmpty()) {
+            return ResponseHelper::success("No order items found for the given order ID.", []);
+        }
+
+        return ResponseHelper::success("Order items retrieved successfully.", $orderItems);
+    }
 }

@@ -15,4 +15,8 @@ class OrderItem extends Model
     {
         return $this->hasMany(Item::class);
     }
+    public static function byOrderId($orderId)
+    {
+        return self::where('order_id', $orderId)->get();
+    }
 }

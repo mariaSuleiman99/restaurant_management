@@ -2,14 +2,15 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class OrderItemRequest extends FormRequest
+
+class OrderItemRequest extends BaseRequest
 {
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -17,7 +18,7 @@ class OrderItemRequest extends FormRequest
             'count' => 'required|integer|min:1', // Count must be a positive integer
             'price' => 'required|numeric|min:0', // Price must be a positive number
             'item_id' => 'required|exists:items,id', // Must reference an existing item
-            'order_id' => 'required|exists:orders,id', // Must reference an existing order
+            'order_id' => 'nullable|exists:orders,id', // Must reference an existing order
         ];
     }
 
@@ -37,7 +38,6 @@ class OrderItemRequest extends FormRequest
             'price.min' => 'The price must be at least 0.',
             'item_id.required' => 'The item ID is required.',
             'item_id.exists' => 'The selected item ID is invalid.',
-            'order_id.required' => 'The order ID is required.',
             'order_id.exists' => 'The selected order ID is invalid.',
         ];
     }

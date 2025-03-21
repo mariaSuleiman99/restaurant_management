@@ -60,4 +60,5 @@ Route::prefix('order-items')->group(function () {
     Route::get('/{id}', [OrderItemController::class, 'show']); // Get a single order item
     Route::put('/{id}', [OrderItemController::class, 'update']); // Update an order item
     Route::delete('/{id}', [OrderItemController::class, 'destroy']); // Delete an order item
+    Route::get('/order/{orderId}', [OrderItemController::class, 'getByOrderId']); // Get order items by order ID
 });
