@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->longText('description')->nullable();
             $table->string('location')->nullable();
+            $table->string('profile_image')->nullable();
+            $table->string('cover_image')->nullable();
             $table->timestamps();
         });
     }
