@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ImageHelper;
 use App\Http\Requests\RestaurantRequest;
 use App\Http\Requests\UpdateRestaurantRequest;
 use App\Models\Restaurant;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 class RestaurantController extends Controller
 {
@@ -18,9 +21,20 @@ class RestaurantController extends Controller
     public function index(): JsonResponse
     {
         $restaurants = Restaurant::all();
+//        $restaurants = Restaurant::paginate(3, ['*'], 'page', 1);
 
         // Return success response with the list of restaurants
-        return ResponseHelper::success("Restaurants retrieved successfully.",null, $restaurants);
+        return ResponseHelper::success("Restaurants retrieved successfully.", null, $restaurants);
+    }
+
+    public function search(Request $request): JsonResponse
+    {
+
+        $restaurants = Restaurant::search($request->all());
+//        $restaurants = Restaurant::paginate(3, ['*'], 'page', 1);
+
+        // Return success response with the list of restaurants
+        return ResponseHelper::success("Restaurants retrieved successfully.", null, $restaurants);
     }
 
     /**
@@ -31,10 +45,20 @@ class RestaurantController extends Controller
      */
     public function store(RestaurantRequest $request): JsonResponse
     {
-        // Validation is handled by the RestaurantRequest class
+        // Handle image upload using the helper
+        $profileImagePath = $request->hasFile('profile_image')
+            ? ImageHelper::uploadImage($request->file('profile_image'), 'restaurants')
+            : null;
+        $coverImagePath = $request->hasFile('cover_image')
+            ? ImageHelper::uploadImage($request->file('cover_image'), 'restaurants')
+            : null;
+        // Merge the image path into the validated data
+        $validatedData = $request->validated();
+        $validatedData['profile_image'] = $profileImagePath;
+        $validatedData['cover_image'] = $coverImagePath;
 
         // Create the restaurant using validated data
-        $restaurant = Restaurant::create($request->validated());
+        $restaurant = Restaurant::create($validatedData);
 
         // Return success response with the created restaurant
         return ResponseHelper::success("Restaurant created successfully.", $restaurant, 201);
@@ -46,7 +70,7 @@ class RestaurantController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function show($id): JsonResponse
+    public function show(int $id): JsonResponse
     {
         // Find the restaurant by ID
         $restaurant = Restaurant::find($id);
@@ -67,7 +91,7 @@ class RestaurantController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function update(UpdateRestaurantRequest $request, int $id): JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
         // Find the restaurant by ID
         $restaurant = Restaurant::find($id);
@@ -76,9 +100,14 @@ class RestaurantController extends Controller
             // Return error response if the restaurant is not found
             return ResponseHelper::error("Restaurant not found.", 404);
         }
+        // Get the validated data from the request
+//        $validatedData = $request->validated();
 
+        // Log the validated data for debugging
+//        Log::info('$validatedData:', $validatedData);
+        Log::info('$request->all():', $request->all());
         // Update the restaurant with validated data
-        $restaurant->update($request->validated());
+        $restaurant->update($request->all());
 
         // Return success response with the updated restaurant
         return ResponseHelper::success("Restaurant updated successfully.", $restaurant);

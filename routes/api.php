@@ -16,6 +16,7 @@ Route::get('/user', function (Request $request) {
 // Group all restaurant-related routes under the 'restaurants' prefix
 Route::prefix('restaurants')->group(function () {
     Route::get('/', [RestaurantController::class, 'index']); // List all restaurants
+    Route::get('/search', [RestaurantController::class, 'search']); // List all restaurants
     Route::post('/', [RestaurantController::class, 'store']); // Create a new restaurant
     Route::get('/{id}', [RestaurantController::class, 'show']); // Get a single restaurant by ID
     Route::put('/{id}', [RestaurantController::class, 'update']); // Update a restaurant by ID
@@ -60,4 +61,5 @@ Route::prefix('order-items')->group(function () {
     Route::get('/{id}', [OrderItemController::class, 'show']); // Get a single order item
     Route::put('/{id}', [OrderItemController::class, 'update']); // Update an order item
     Route::delete('/{id}', [OrderItemController::class, 'destroy']); // Delete an order item
+    Route::get('/order/{orderId}', [OrderItemController::class, 'getByOrderId']); // Get order items by order ID
 });

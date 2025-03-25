@@ -3,12 +3,14 @@
 namespace App\Http\Requests;
 
 
+use Illuminate\Contracts\Validation\ValidationRule;
+
 class RestaurantRequest extends BaseRequest
 {
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -17,6 +19,8 @@ class RestaurantRequest extends BaseRequest
             'name' => 'required|string|unique:restaurants,name|max:255', // Unique restaurant name
             'description' => 'nullable|string', // Optional long text description
             'location' => 'nullable|string|max:255', // Optional location
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB,
+            'cover_image'=> 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
         ];
 
     }
@@ -36,6 +40,14 @@ class RestaurantRequest extends BaseRequest
             'name.max' => 'The restaurant name must not exceed 255 characters.',
             'description.string' => 'The description must be a valid string.',
             'location.max' => 'The location must not exceed 255 characters.',
+            // Profile Image Messages
+            'profile_image.image' => 'The profile image must be a valid image file.',
+            'profile_image.mimes' => 'The profile image must be of type: jpeg, png, jpg, or gif.',
+            'profile_image.max' => 'The profile image size must not exceed 2MB.',
+            // Cover Image Messages
+            'cover_image.image' => 'The cover image must be a valid image file.',
+            'cover_image.mimes' => 'The cover image must be of type: jpeg, png, jpg, or gif.',
+            'cover_image.max' => 'The cover image size must not exceed 2MB.',
         ];
     }
 }
