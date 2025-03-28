@@ -39,6 +39,7 @@ Route::prefix('reservations')->group(function () {
 });
 Route::prefix('orders')->group(function () {
     Route::get('/', [OrderController::class, 'index']); // List all orders
+    Route::get('/search', [OrderController::class, 'search']); // search all orders
     Route::post('/', [OrderController::class, 'store']); // Create an order
     Route::get('/{id}', [OrderController::class, 'show']); // Get a single order
     Route::put('/{id}', [OrderController::class, 'update']); // Update an order
@@ -48,6 +49,7 @@ Route::prefix('orders')->group(function () {
 });
 Route::prefix('items')->group(function () {
     Route::get('/', [ItemController::class, 'index']); // List all items
+    Route::get('/search', [ItemController::class, 'search']); // search all items
     Route::post('/', [ItemController::class, 'store']); // Create an item
     Route::get('/{id}', [ItemController::class, 'show']); // Get a single item
     Route::put('/{id}', [ItemController::class, 'update']); // Update an item

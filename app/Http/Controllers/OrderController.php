@@ -7,7 +7,7 @@ use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
@@ -123,5 +123,15 @@ class OrderController extends Controller
 
         // Return success response
         return ResponseHelper::success("Order status updated successfully.", $order);
+    }
+
+    public function search(Request $request): JsonResponse
+    {
+        // Call the search method and get the results
+        $searchResults = Order::search($request->all());
+        // Extract items and total count
+        $orders = $searchResults['items'];
+        $totalCount = $searchResults['total_count'];
+        return ResponseHelper::success("Orders retrieved successfully.", null, $orders,$totalCount);
     }
 }
