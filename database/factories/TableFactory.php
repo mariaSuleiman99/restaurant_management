@@ -18,7 +18,7 @@ class TableFactory extends Factory
     {
         return [
             'capacity' => fake()->randomDigit(),
-            'number' => fake()->unique()->randomAscii(),
+            'number' => fake()->unique()->randomNumber(),
             'restaurant_id' => 1
         ];
     }
