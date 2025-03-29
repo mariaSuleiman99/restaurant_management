@@ -33,13 +33,4 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
-    public static function byOrder(int $orderId): Collection
-    {
-        return self::where('orderId', $orderId)->get()->items();
-    }
-
-    public static function byUserAndStatus(int $orderId, string $status): Collection
-    {
-        return self::where('orderId', $orderId, 'status', $status)->get()->items();
-    }
 }

@@ -32,7 +32,7 @@ class Generic extends Model
                     $columnType = Schema::getColumnType($table, $field);
 
                     // Apply the appropriate condition based on the column type
-                    if (str_contains($columnType, 'string') || str_contains($columnType, 'text')) {
+                    if (str_contains($columnType, 'string') || str_contains($columnType, 'text') || str_contains($columnType, 'varchar')) {
                         // Use LIKE for string/text columns
                         $query->where($field, 'LIKE', "%{$value}%");
                     } else {
