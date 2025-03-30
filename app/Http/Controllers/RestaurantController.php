@@ -45,20 +45,10 @@ class RestaurantController extends Controller
      */
     public function store(RestaurantRequest $request): JsonResponse
     {
-        // Handle image upload using the helper
-        $profileImagePath = $request->hasFile('profile_image')
-            ? ImageHelper::uploadImage($request->file('profile_image'), 'restaurants')
-            : null;
-        $coverImagePath = $request->hasFile('cover_image')
-            ? ImageHelper::uploadImage($request->file('cover_image'), 'restaurants')
-            : null;
-        // Merge the image path into the validated data
-        $validatedData = $request->validated();
-        $validatedData['profile_image'] = $profileImagePath;
-        $validatedData['cover_image'] = $coverImagePath;
+
 
         // Create the restaurant using validated data
-        $restaurant = Restaurant::create($validatedData);
+        $restaurant = Restaurant::create($request->validated());
 
         // Return success response with the created restaurant
         return ResponseHelper::success("Restaurant created successfully.", $restaurant, 201);

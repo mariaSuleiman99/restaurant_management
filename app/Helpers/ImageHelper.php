@@ -18,7 +18,7 @@ class ImageHelper
     {
         if ($file) {
             // Store the file in the specified directory (e.g., 'public/images')
-            return $file->store($directory, 'public');
+            return 'storage/'.$file->store($directory, 'public');
         }
 
         return null;

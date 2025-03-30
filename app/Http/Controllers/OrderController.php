@@ -129,6 +129,7 @@ class OrderController extends Controller
 
     function syncOrderItems($request, $order): void
     {
+        if(!$request->has('order_items'))return;
         $orderItems = $request->input('order_items');
 
         foreach ($orderItems as $itemData) {

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->string('profile_image')->nullable();
             $table->string('cover_image')->nullable();
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }

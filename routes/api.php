@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
@@ -63,3 +64,4 @@ Route::prefix('order-items')->group(function () {
     Route::delete('/{id}', [OrderItemController::class, 'destroy']); // Delete an order item
     Route::get('/order/{orderId}', [OrderItemController::class, 'getByOrderId']); // Get order items by order ID
 });
+Route::post('/upload', [ImageController::class, 'store']); // Create a new restaurant

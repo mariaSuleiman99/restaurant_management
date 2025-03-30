@@ -19,8 +19,9 @@ class RestaurantRequest extends BaseRequest
             'name' => 'required|string|unique:restaurants,name|max:255', // Unique restaurant name
             'description' => 'nullable|string', // Optional long text description
             'location' => 'nullable|string|max:255', // Optional location
-            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB,
-            'cover_image'=> 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
+            'profile_image' => 'nullable|string', // Max 2MB,
+            'cover_image'=> 'nullable|string', // Max 2MB
+            'status'=> 'nullable|string', // Max 2MB
         ];
 
     }
