@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateItemRequest;
 use App\Models\Item;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ItemController extends Controller
 {
@@ -102,5 +103,15 @@ class ItemController extends Controller
         }
 
         return ResponseHelper::success("Items retrieved successfully.",null, $items);
+    }
+
+    public function search(Request $request): JsonResponse
+    {
+        // Call the search method and get the results
+        $searchResults = Item::search($request->all());
+        // Extract items and total count
+        $items = $searchResults['items'];
+        $totalCount = $searchResults['total_count'];
+        return ResponseHelper::success("Items retrieved successfully.", null, $items,$totalCount);
     }
 }

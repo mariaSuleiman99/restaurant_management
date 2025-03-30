@@ -40,6 +40,26 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'api' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+//        'User' => [
+//            'driver' => 'jwt',
+//            'provider' => 'users',
+//            'hash' => true
+//        ],
+//        'Restaurant_Admin' => [
+//            'driver' => 'jwt',
+//            'provider' => 'users',
+//            'hash' => true
+//        ],
+//        'System_Admin' => [
+//            'driver' => 'jwt',
+//            'provider' => 'users',
+//            'hash' => true
+//        ],
     ],
 
     /*

@@ -29,12 +29,12 @@ class RestaurantController extends Controller
 
     public function search(Request $request): JsonResponse
     {
-
-        $restaurants = Restaurant::search($request->all());
-//        $restaurants = Restaurant::paginate(3, ['*'], 'page', 1);
-
-        // Return success response with the list of restaurants
-        return ResponseHelper::success("Restaurants retrieved successfully.", null, $restaurants);
+        // Call the search method and get the results
+        $searchResults = Restaurant::search($request->all());
+        // Extract items and total count
+        $restaurants = $searchResults['items'];
+        $totalCount = $searchResults['total_count'];
+        return ResponseHelper::success("Restaurants retrieved successfully.", null, $restaurants,$totalCount);
     }
 
     /**
@@ -81,24 +81,35 @@ class RestaurantController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateRestaurantRequest $request, int $id): JsonResponse
     {
         // Find the restaurant by ID
         $restaurant = Restaurant::find($id);
-
+        Log::debug('first $request->all():', $request->all());
         if (!$restaurant) {
             // Return error response if the restaurant is not found
             return ResponseHelper::error("Restaurant not found.", 404);
         }
         // Get the validated data from the request
-//        $validatedData = $request->validated();
+        $validatedData = $request->validated();
+        // Handle profile_image upload
+        if ($request->hasFile('profile_image')) {
+            ImageHelper::deleteImage($restaurant->profile_image); // Delete old profile image
+            $imagePath = ImageHelper::uploadImage($request->file('profile_image'), 'restaurants');
+            $validatedData['profile_image'] = $imagePath; // Add the new image path
+        }
 
+        // Handle cover_image upload
+        if ($request->hasFile('cover_image')) {
+            ImageHelper::deleteImage($restaurant->cover_image); // Delete old cover image
+            $coverImagePath = ImageHelper::uploadImage($request->file('cover_image'), 'restaurants');
+            $validatedData['cover_image'] = $coverImagePath; // Add the new image path
+        }
         // Log the validated data for debugging
-//        Log::info('$validatedData:', $validatedData);
-        Log::info('$request->all():', $request->all());
+        Log::debug('$validatedData:', $validatedData);
+        Log::debug('$request->all():', $request->all());
         // Update the restaurant with validated data
-        $restaurant->update($request->all());
-
+        $restaurant->update($validatedData);
         // Return success response with the updated restaurant
         return ResponseHelper::success("Restaurant updated successfully.", $restaurant);
     }

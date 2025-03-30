@@ -8,11 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable,HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -23,6 +25,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+//        'role_id'
     ];
 
     /**
@@ -47,11 +50,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-    function role(): BelongsTo
-    {
-        return $this->belongsTo(Role::class);
-    }
+//    public function hasRole($role)
+//    {
+//        return $this->role === $role; // Adjust this logic based on your database schema
+//    }
     function restaurant(): BelongsTo
     {
         return $this->belongsTo(Restaurant::class);

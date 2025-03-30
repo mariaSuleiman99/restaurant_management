@@ -6,8 +6,9 @@ use App\Models\Restaurant;
 use App\Models\Table;
 use App\Models\User;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,12 +21,18 @@ class DatabaseSeeder extends Seeder
         Restaurant::factory(10)->create(); //should be removed when uploaded to PROD
         Table::factory(10)->create(); //should be removed when uploaded to PROD
         $this->call(RoleSeeder::class);
-        User::factory()->create([
+        $user = User::factory()->create([
             'name' => 'System Admin',
             'email' => 'systemAdmin@mail.com',
             'force_update' => false,
             'status' => 'Active',
-            'role_id' => 1
         ]);
+        // Assign the System Admin role
+        $role = Role::where('name', 'System Admin')->first();
+        if ($role) {
+            $user->assignRole($role);
+        } else {
+            throw new \Exception("Role 'System Admin' not found.");
+        }
     }
 }

@@ -14,7 +14,7 @@ class UpdateTableRequest extends BaseRequest
     public function rules(): array
     {
         // Retrieve the table ID from the route parameter
-        $tableId = $this->route('table');
+        $tableId = $this->route('id');
         return [
             'capacity' => 'sometimes|integer|min:1', // Only validate if present
             'number' => [

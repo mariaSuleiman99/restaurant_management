@@ -45,13 +45,21 @@ class Generic extends Model
         // Extract pagination parameters from the request (no defaults)
         $page = request()->input('page');
         $perPage = request()->input('per_page');
-        Log::info("page");
-        Log::debug($page);
-        Log::debug($perPage);
         if ($page !== null && $perPage !== null) {
             // Paginate the results
-            return $query->paginate((int) $perPage, ['*'], 'page',(int) $page)->items();
-        } else
-            return $query->get()->toArray();
+            $paginatedResults = $query->paginate((int)$perPage, ['*'], 'page', (int)$page);
+            // Return both the items and the total count
+            return [
+                'items' => $paginatedResults->items(),
+                'total_count' => $paginatedResults->total(),
+            ];
+        } else {
+            // Return all results and the total count
+            $results = $query->get();
+            return [
+                'items' => $results->toArray(),
+                'total_count' => $results->count(),
+            ];
+        }
     }
 }

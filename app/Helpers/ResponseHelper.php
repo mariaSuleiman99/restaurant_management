@@ -15,14 +15,19 @@ class ResponseHelper
      * @param int $statusCode
      * @return JsonResponse
      */
-    public static function success(string $message = "Success", mixed $model = null, $list = null, int $statusCode = 200): JsonResponse
+    public static function success(string $message = "Success", mixed $model = null, $list = null,?int $totalCount = null ,int $statusCode = 200): JsonResponse
     {
-        return response()->json([
+        $response = [
             'status' => 'success',
             'message' => $message,
             'model' => $model,
             'list' => $list,
-        ], $statusCode);
+        ];
+        // Include total count if provided
+        if ($totalCount !== null) {
+            $response['total_count'] = $totalCount;
+        }
+        return response()->json($response, $statusCode);
     }
 
     /**
