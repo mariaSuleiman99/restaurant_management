@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
 
 class Item extends Generic
@@ -27,4 +28,12 @@ class Item extends Generic
     {
         return self::where('restaurant_id', $restaurantId)->get();
     }
+    /**
+     * Relationship: An item can have many ratings.
+     */
+    public function ratings(): MorphMany
+    {
+        return $this->morphMany(Rating::class, 'rateable');
+    }
+
 }

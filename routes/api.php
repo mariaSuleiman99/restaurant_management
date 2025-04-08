@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\TableController;
@@ -78,6 +79,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/', [ReservationController::class, 'store']); // Create a reservation
             Route::get('/{id}', [ReservationController::class, 'show']); // Get a single reservation
         });
+
+        Route::prefix('ratings')->group(function () {
+            Route::post('/', [RatingController::class, 'store']); // add rating
+            Route::put('/{id}', [RatingController::class, 'update']); // update rating
+//            Route::get('/{id}', [RatingController::class, 'show']); // Get a single rating
+        });
+
         Route::prefix('orders')->group(function () {
             Route::get('/', [OrderController::class, 'index']); // List all orders
             Route::get('/search', [OrderController::class, 'search']); // Search orders
