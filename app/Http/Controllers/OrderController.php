@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -106,6 +107,29 @@ class OrderController extends Controller
         return ResponseHelper::success("Orders retrieved successfully.", null, $orders);
     }
 
+    public function getUserCart(): JsonResponse
+    {
+        $user = Auth::user();
+        error_log($user);
+        $orders = Order::getCart($user->getAuthIdentifier());
+        if ($orders->isEmpty()) {
+            return ResponseHelper::success("No Cart found for the given status.", null, []);
+        }
+
+        return ResponseHelper::success("Cart retrieved successfully.", null, $orders);
+    }
+
+    public function getUserOrders(): JsonResponse
+    {
+        $user = Auth::user();
+        $orders = Order::getUserOrders($user->getAuthIdentifier());
+        if ($orders->isEmpty()) {
+            return ResponseHelper::success("No Cart found for the given status.", null, []);
+        }
+
+        return ResponseHelper::success("Cart retrieved successfully.", null, $orders);
+    }
+
     public function updateStatus(int $id, Request $request): JsonResponse
     {
         // Validate the request
@@ -134,12 +158,12 @@ class OrderController extends Controller
         // Extract items and total count
         $orders = $searchResults['items'];
         $totalCount = $searchResults['total_count'];
-        return ResponseHelper::success("Orders retrieved successfully.", null, $orders,$totalCount);
+        return ResponseHelper::success("Orders retrieved successfully.", null, $orders, $totalCount);
     }
 
     function syncOrderItems($request, $order): void
     {
-        if(!$request->has('order_items'))return;
+        if (!$request->has('order_items')) return;
         $orderItems = $request->input('order_items');
 
         foreach ($orderItems as $itemData) {

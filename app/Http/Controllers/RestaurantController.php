@@ -93,18 +93,18 @@ class RestaurantController extends Controller
         // Get the validated data from the request
         $validatedData = $request->validated();
         // Handle profile_image upload
-        if ($request->hasFile('profile_image')) {
-            ImageHelper::deleteImage($restaurant->profile_image); // Delete old profile image
-            $imagePath = ImageHelper::uploadImage($request->file('profile_image'), 'restaurants');
-            $validatedData['profile_image'] = $imagePath; // Add the new image path
-        }
-
-        // Handle cover_image upload
-        if ($request->hasFile('cover_image')) {
-            ImageHelper::deleteImage($restaurant->cover_image); // Delete old cover image
-            $coverImagePath = ImageHelper::uploadImage($request->file('cover_image'), 'restaurants');
-            $validatedData['cover_image'] = $coverImagePath; // Add the new image path
-        }
+//        if ($request->hasFile('profile_image')) {
+//            ImageHelper::deleteImage($restaurant->profile_image); // Delete old profile image
+//            $imagePath = ImageHelper::uploadImage($request->file('profile_image'), 'restaurants');
+//            $validatedData['profile_image'] = $imagePath; // Add the new image path
+//        }
+//
+//        // Handle cover_image upload
+//        if ($request->hasFile('cover_image')) {
+//            ImageHelper::deleteImage($restaurant->cover_image); // Delete old cover image
+//            $coverImagePath = ImageHelper::uploadImage($request->file('cover_image'), 'restaurants');
+//            $validatedData['cover_image'] = $coverImagePath; // Add the new image path
+//        }
         // Log the validated data for debugging
         Log::debug('$validatedData:', $validatedData);
         Log::debug('$request->all():', $request->all());

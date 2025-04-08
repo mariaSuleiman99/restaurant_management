@@ -27,6 +27,14 @@ class Order extends Generic
         return self::where('status', $status)->with('orderItems.item')->get();
     }
 
+    public static function getCart(int $userId): Collection
+    {
+        return self::where('user_id', $userId)->where('status', 'InCart')->with('orderItems.item')->get();
+    }   public static function getUserOrders(int $userId): Collection
+    {
+        return self::where('user_id', $userId)->where('status','<>', 'InCart')->with('orderItems.item')->get();
+    }
+
     public function updatePrice($id): void
     {
         $totalCount = 0;

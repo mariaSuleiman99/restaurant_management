@@ -20,11 +20,13 @@ class AuthController extends Controller
             $user = Auth::user();
 
             // Get the user's role
-            $role = $user->getRoleNames()->first(); // Returns the first role (single role)
-            $user["role"] = $role;
+//            $role = $user->getRoleNames()->first(); // Returns the first role (single role)
+//            $user["role"] = $role;
+            $user["user_role"] = $user->role->name; // Assuming the 'roles' table has a 'name' column
 
             $token = $user->createToken('authToken')->plainTextToken;
 
+            $user['token']=$token;
             return ResponseHelper::success("Login successfully", $user)->withHeaders([
                 'Authorization' => 'Bearer ' . $token,
             ]);

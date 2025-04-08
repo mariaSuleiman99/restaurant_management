@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'Active',
         ]);
         // Assign the System Admin role
-        $role = Role::where('name', 'System Admin')->first();
+        $role = Role::where('name', 'System_Admin')->first();
         if ($role) {
             $user->assignRole($role);
         } else {

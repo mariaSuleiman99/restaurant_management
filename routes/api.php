@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
@@ -21,6 +22,16 @@ Route::prefix('restaurants')->group(function () {
     Route::get('/search', [RestaurantController::class, 'search']); // Search restaurants
     Route::get('/{id}', [RestaurantController::class, 'show']); // Get a single restaurant
 });
+Route::prefix('items')->group(function () {
+    Route::get('/', [ItemController::class, 'index']); // List all items
+    Route::get('/search', [ItemController::class, 'search']); // Search items
+    Route::get('/{id}', [ItemController::class, 'show']); // Get a single item
+    Route::get('/restaurant/{restaurant}', [ItemController::class, 'getByRestaurantId']); // Get items by restaurant
+});
+Route::post('/upload', [ImageController::class, 'store']); // Get items by restaurant
+Route::prefix('restaurants')->group(function () {
+    Route::post('/', [RestaurantController::class, 'store']); // Create a new restaurant
+});
 
 // Protected routes (require authentication)
 Route::middleware('auth:sanctum')->group(function () {
@@ -29,11 +40,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-
     // Admin-only routes
-    Route::middleware('role:Restaurant_Admin')->group(function () {
+
+    Route::middleware("role:User|Restaurant_Admin")->group(function () {
         Route::prefix('restaurants')->group(function () {
-            Route::post('/', [RestaurantController::class, 'store']); // Create a new restaurant
+//            Route::post('/', [RestaurantController::class, 'store']); // Create a new restaurant
             Route::put('/{id}', [RestaurantController::class, 'update']); // Update a restaurant
             Route::delete('/{id}', [RestaurantController::class, 'destroy']); // Delete a restaurant
         });
@@ -57,17 +68,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('order-items')->group(function () {
             Route::post('/', [OrderItemController::class, 'store']); // Create an order item
             Route::put('/{id}', [OrderItemController::class, 'update']); // Update an order item
-            Route::delete('/{id}', [OrderItemController::class, 'destroy']); // Delete an order item
+//            Route::delete('/{id}', [OrderItemController::class, 'destroy']); // Delete an order item
         });
     });
 
     // User-only routes
     Route::middleware("role:User|Restaurant_Admin")->group(function () {
-        Route::prefix('restaurants')->group(function () {
-            Route::get('/', [RestaurantController::class, 'index']); // List all restaurants
-            Route::get('/search', [RestaurantController::class, 'search']); // Search restaurants
-            Route::get('/{id}', [RestaurantController::class, 'show']); // Get a single restaurant
-        });
+//        Route::prefix('restaurants')->group(function () {
+//            Route::get('/', [RestaurantController::class, 'index']); // List all restaurants
+//            Route::get('/search', [RestaurantController::class, 'search']); // Search restaurants
+//            Route::get('/{id}', [RestaurantController::class, 'show']); // Get a single restaurant
+//        });
         Route::prefix('tables')->group(function () {
             Route::get('/', [TableController::class, 'index']); // List all tables
             Route::get('/{id}', [TableController::class, 'show']); // Get a single table
@@ -82,19 +93,23 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', [OrderController::class, 'index']); // List all orders
             Route::get('/search', [OrderController::class, 'search']); // Search orders
             Route::post('/', [OrderController::class, 'store']); // Create an order
+            Route::get('/cart', [OrderController::class, 'getUserCart']); // Get orders by status
+            Route::get('/by-user', [OrderController::class, 'getUserOrders']); // Get orders by status
             Route::get('/{id}', [OrderController::class, 'show']); // Get a single order
+            Route::put('/{id}', [OrderController::class, 'update']); // Update order status
             Route::get('/status/{status}', [OrderController::class, 'getOrdersByStatus']); // Get orders by status
         });
-        Route::prefix('items')->group(function () {
-            Route::get('/', [ItemController::class, 'index']); // List all items
-            Route::get('/search', [ItemController::class, 'search']); // Search items
-            Route::get('/{id}', [ItemController::class, 'show']); // Get a single item
-            Route::get('/restaurant/{restaurant}', [ItemController::class, 'getByRestaurantId']); // Get items by restaurant
-        });
+//        Route::prefix('items')->group(function () {
+//            Route::get('/', [ItemController::class, 'index']); // List all items
+//            Route::get('/search', [ItemController::class, 'search']); // Search items
+//            Route::get('/{id}', [ItemController::class, 'show']); // Get a single item
+//            Route::get('/restaurant/{restaurant}', [ItemController::class, 'getByRestaurantId']); // Get items by restaurant
+//        });
         Route::prefix('order-items')->group(function () {
             Route::get('/', [OrderItemController::class, 'index']); // List all order items
             Route::get('/{id}', [OrderItemController::class, 'show']); // Get a single order item
             Route::get('/order/{orderId}', [OrderItemController::class, 'getByOrderId']); // Get order items by order ID
+            Route::delete('/{id}', [OrderItemController::class, 'destroy']); // Delete an order item
         });
     });
 });

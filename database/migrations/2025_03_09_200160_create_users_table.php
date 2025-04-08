@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-//            $table->foreignIdFor(Role::class)->nullable()->constrained();
+            $table->foreignIdFor(Role::class)->nullable()->constrained();
             $table->foreignIdFor(Restaurant::class)->nullable();
             $table->rememberToken();
             $table->timestamps();
