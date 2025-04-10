@@ -110,7 +110,6 @@ class OrderController extends Controller
     public function getUserCart(): JsonResponse
     {
         $user = Auth::user();
-        error_log($user);
         $orders = Order::getCart($user->getAuthIdentifier());
         if ($orders->isEmpty()) {
             return ResponseHelper::success("No Cart found for the given status.", null, []);
