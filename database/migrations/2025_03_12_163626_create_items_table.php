@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string("description");
             $table->string("image");
             $table->float("price");
+            $table->decimal('avg_rate', 3, 1)->default(0);
             $table->foreignIdFor(Restaurant::class)->constrained();
             $table->timestamps();
         });

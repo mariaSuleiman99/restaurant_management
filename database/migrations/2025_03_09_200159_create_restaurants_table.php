@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('mobile_number')->unique();
             $table->string('name')->unique();
             $table->longText('description')->nullable();
+            $table->decimal('avg_rate', 3, 1)->default(0);
             $table->string('location')->nullable();
             $table->string('profile_image')->nullable();
             $table->string('cover_image')->nullable();

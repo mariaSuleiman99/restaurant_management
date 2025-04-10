@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 //use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Restaurant extends Generic
 {
@@ -28,5 +29,13 @@ class Restaurant extends Generic
     function items(): HasMany
     {
         return $this->hasMany(Item::class);
+    }
+
+    /**
+     * Relationship: An item can have many ratings.
+     */
+    public function ratings(): MorphMany
+    {
+        return $this->morphMany(Rating::class, 'rateable');
     }
 }
