@@ -76,11 +76,24 @@ class RestaurantController extends Controller
         $restaurant = Restaurant::find($id);
 
         if (!$restaurant) {
-            // Return error response if the restaurant is not found
             return ResponseHelper::error("Restaurant not found.", 404);
         }
 
-        // Return success response with the restaurant details
+        // Get the authenticated user
+        $user = auth()->user();
+        // Find the user's rating for this restaurant
+        $userRating = null;
+        if ($user) {
+            $userRating = $restaurant->ratings
+                ->where('user_id', $user->id)
+                ->first()?->rating; // Get the rating value
+        }
+        $restaurant['user_rating']=$userRating;
+        // Prepare the response data
+//        $responseData = [
+//            'restaurant' => $restaurant,
+//            'user_rating' => $userRating,
+//        ];
         return ResponseHelper::success("Restaurant retrieved successfully.", $restaurant);
     }
 
