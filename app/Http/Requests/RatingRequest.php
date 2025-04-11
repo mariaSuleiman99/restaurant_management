@@ -2,42 +2,38 @@
 
 namespace App\Http\Requests;
 
-class RatingRequest extends BaseRequest
+use Illuminate\Foundation\Http\FormRequest;
+
+class RatingRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return true;
+        return true; // Allow all authenticated users to add ratings
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
+        $type = $this->route('type'); // Get the rateable_type from the route parameter
+        $rateableTypeMap = [
+            'restaurant' => 'App\Models\Restaurant',
+            'item' => 'App\Models\Item',
+        ];
+        if (!isset($rateableTypeMap[$type])) {
+            abort(400, 'Invalid rateable type.');
+        }
         return [
-            'user_id' => 'required|exists:users,id', // Ensure the user exists
-            'rateable_type' => 'required|string|in:App\Models\Restaurant,App\Models\Item', // Valid entity types
-            'rateable_id' => 'required|integer|exists:' . $this->input('rateable_type') . ',id', // Ensure the entity exists
-            'rating' => 'required|min:1|max:5', // Rating must be between 1 and 5
+            'rateable_id' => 'required|integer|exists:' . $rateableTypeMap[$type] . ',id', // Use the mapped model class
+            'rating' => 'required|numeric|min:1|max:5|regex:/^\d+(\.\d{1})?$/', // Rating must be between 1 and 5 with one decimal place
         ];
     }
 
-    /**
-     * Custom error messages (optional).
-     */
     public function messages(): array
     {
         return [
-            'user_id.exists' => 'The selected user does not exist.',
-            'rateable_type.in' => 'Invalid entity type. Must be "App\Models\Restaurant" or "App\Models\Item".',
             'rateable_id.exists' => 'The selected entity does not exist.',
             'rating.min' => 'The rating must be at least 1.',
             'rating.max' => 'The rating cannot exceed 5.',
+            'rating.regex' => 'The rating must have at most one decimal place (e.g., 1.5, 2.0).',
         ];
     }
 }

@@ -81,9 +81,11 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
         Route::prefix('ratings')->group(function () {
-            Route::post('/', [RatingController::class, 'store']); // add rating
+//            Route::post('/', [RatingController::class, 'store']); // add rating
+//            Route::post('/restaurant', [RatingController::class, 'addRatingForRestaurant']); // Add rating for a restaurant
+//            Route::post('/item', [RatingController::class, 'addRatingForItem']); // Add rating for an item
+            Route::post('/{type}', [RatingController::class, 'addRating']); // Generic route for adding ratings
             Route::put('/{id}', [RatingController::class, 'update']); // update rating
-//            Route::get('/{id}', [RatingController::class, 'show']); // Get a single rating
         });
 
         Route::prefix('orders')->group(function () {
