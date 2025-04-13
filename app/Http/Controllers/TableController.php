@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TableAvailabilityRequest;
 use App\Http\Requests\TableRequest;
 use App\Http\Requests\UpdateTableRequest;
 use App\Models\Restaurant;
@@ -20,7 +21,7 @@ class TableController extends Controller
     public function index(): JsonResponse
     {
         $tables = Table::all();
-        return ResponseHelper::success("Tables retrieved successfully.",null, $tables);
+        return ResponseHelper::success("Tables retrieved successfully.", null, $tables);
     }
 
     /**
@@ -88,6 +89,7 @@ class TableController extends Controller
         $table->delete();
         return ResponseHelper::success("Table deleted successfully.");
     }
+
     public function getTablesByRestaurantId(int $restaurantId): JsonResponse
     {
         // Find the restaurant by ID
@@ -107,6 +109,25 @@ class TableController extends Controller
         }
 
         // Return success response with the list of tables
-        return ResponseHelper::success("Tables retrieved successfully.",null, $tables);
+        return ResponseHelper::success("Tables retrieved successfully.", null, $tables);
+    }
+
+    /**
+     * Get available tables based on date, time, and people count.
+     */
+    public function getAvailableTables(TableAvailabilityRequest $request): JsonResponse
+    {
+        // Extract request data
+        $date = $request->input('date');
+        $start_time = $request->input('start_time');
+        $end_time = $request->input('end_time');
+        $people_count = $request->input('people_count');
+
+        // Query available tables
+        $availableTables = Table::available($date, $start_time, $end_time, $people_count)->get();
+
+        // Return response
+        return ResponseHelper::success(
+            'Available tables retrieved successfully.', null, $availableTables);
     }
 }
