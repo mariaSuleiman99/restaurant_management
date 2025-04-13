@@ -34,7 +34,7 @@ class RestaurantController extends Controller
         // Extract items and total count
         $restaurants = $searchResults['items'];
         $totalCount = $searchResults['total_count'];
-        return ResponseHelper::success("Restaurants retrieved successfully.", null, $restaurants,$totalCount);
+        return ResponseHelper::success("Restaurants retrieved successfully.", null, $restaurants, $totalCount);
     }
 
     /**
@@ -81,20 +81,22 @@ class RestaurantController extends Controller
 
         // Get the authenticated user
         $user = auth()->user();
-        // Find the user's rating for this restaurant
+
+        // Fetch the user's rating for this restaurant (efficient database query)
         $userRating = null;
         if ($user) {
-            $userRating = $restaurant->ratings
+            $userRating = $restaurant->ratings()
                 ->where('user_id', $user->id)
-                ->first()?->rating; // Get the rating value
+                ->value('rating'); // Efficiently fetch only the rating value
         }
-        $restaurant['user_rating']=$userRating;
+
         // Prepare the response data
-//        $responseData = [
-//            'restaurant' => $restaurant,
-//            'user_rating' => $userRating,
-//        ];
-        return ResponseHelper::success("Restaurant retrieved successfully.", $restaurant);
+        $responseData = [
+            'restaurant' => $restaurant,
+            'user_rating' => $userRating, // Include the user's rating
+        ];
+
+        return ResponseHelper::success("Restaurant retrieved successfully.", $responseData);
     }
 
     /**
