@@ -71,7 +71,8 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         Route::prefix('tables')->group(function () {
             Route::get('/', [TableController::class, 'index']); // List all tables
-            Route::get('/available', [TableController::class, 'getAvailableTables']); // List all tables
+            Route::get('/available', [TableController::class, 'getAvailableTables']); // List available tables
+            Route::post('/{id}/change-status', [TableController::class, 'changeStatus']);
             Route::get('/{id}', [TableController::class, 'show']); // Get a single table
             Route::get('/by-restaurant/{id}', [TableController::class, 'getTablesByRestaurantId']); // Get tables by restaurant
         });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ChangeTableStatusRequest;
 use App\Http\Requests\TableAvailabilityRequest;
 use App\Http\Requests\TableRequest;
 use App\Http\Requests\UpdateTableRequest;
@@ -129,5 +130,27 @@ class TableController extends Controller
         // Return response
         return ResponseHelper::success(
             'Available tables retrieved successfully.', null, $availableTables);
+    }
+
+    public function changeStatus(ChangeTableStatusRequest $request, int $id): JsonResponse
+    {
+        // Find the table by ID
+        $table = Table::find($id);
+
+        if (!$table) {
+            return response()->json(['message' => 'Table not found.'], 404);
+        }
+
+        // Extract the new status from the request
+        $newStatus = $request->input('status');
+
+        // Update the table's status
+        $table->update(['status' => $newStatus]);
+
+        // Return success response
+        return response()->json([
+            'message' => 'Table status updated successfully.',
+            'data' => $table,
+        ]);
     }
 }
