@@ -84,6 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('tables')->group(function () {
             Route::get('/', [TableController::class, 'index']); // List all tables
             Route::get('/search', [TableController::class, 'search']); // Get a single table
+            Route::get('/available', [TableController::class, 'getAvailableTables']); // List all tables
             Route::get('/{id}', [TableController::class, 'show']); // Get a single table
             Route::get('/by-restaurant/{id}', [TableController::class, 'getTablesByRestaurantId']); // Get tables by restaurant
         });
@@ -95,9 +96,11 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
         Route::prefix('ratings')->group(function () {
-            Route::post('/', [RatingController::class, 'store']); // add rating
+//            Route::post('/', [RatingController::class, 'store']); // add rating
+//            Route::post('/restaurant', [RatingController::class, 'addRatingForRestaurant']); // Add rating for a restaurant
+//            Route::post('/item', [RatingController::class, 'addRatingForItem']); // Add rating for an item
+            Route::post('/{type}', [RatingController::class, 'addRating']); // Generic route for adding ratings
             Route::put('/{id}', [RatingController::class, 'update']); // update rating
-//            Route::get('/{id}', [RatingController::class, 'show']); // Get a single rating
         });
 
         Route::prefix('orders')->group(function () {

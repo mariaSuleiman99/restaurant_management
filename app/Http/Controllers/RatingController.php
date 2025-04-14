@@ -7,6 +7,8 @@ use App\Http\Requests\RatingRequest;
 use App\Http\Requests\UpdateRatingRequest;
 use App\Models\Rating;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use function Psy\debug;
 
 class RatingController extends Controller
 {
@@ -16,13 +18,67 @@ class RatingController extends Controller
     public function store(RatingRequest $request): JsonResponse
     {
         $validated = $request->validated();
-
         // Create the rating
         $rating = Rating::create($validated);
+        return ResponseHelper::success("Rating created successfully.", $rating, null, 201);
+    }
 
-        // Update avg_rate for the associated entity
-        $this->updateAvgRate($rating);
+//    /**
+//     * Store a newly created rating for a restaurant.
+//     */
+//    public function addRatingForRestaurant(RatingRequest $request): JsonResponse
+//    {
+//        // Get the authenticated user's ID from the token
+//        $userId = $request->user()->id;
+//        // Validate the request data
+//        $validated = $request->validated();
+//        // Add the user_id and rateable_type to the validated data
+//        $validated['user_id'] = $userId;
+//        $validated['rateable_type'] = 'App\Models\Restaurant'; // Hardcode the rateable_type for restaurants
+//        // Create the rating
+//        $rating = Rating::create($validated);
+//        return ResponseHelper::success("Rating created successfully.", $rating, null, 201);
+//    }
+//
+//    public function addRatingForItem(RatingRequest $request): JsonResponse
+//    {
+//        // Get the authenticated user's ID from the token
+//        $userId = $request->user()->id;
+//// Merge the user_id and rateable_type into the request data
+//        $request->merge([
+//            'user_id' => $userId,
+//            'rateable_type' => 'App\Models\Item', // Set the rateable_type based on the route parameter
+//        ]);
+//
+//        // Validate the request data
+//        $validated = $request->validated();
+//
+//        // Add the user_id and rateable_type to the validated data
+//        $validated['user_id'] = $userId;
+//        $validated['rateable_type'] = ; // Hardcode the rateable_type for items
+//        // Create the rating
+//        $rating = Rating::create($validated);
+//        return ResponseHelper::success("Rating created successfully.", $rating, null, 201);
+//    }
 
+    public function addRating(RatingRequest $request, string $type): JsonResponse
+    {
+        // Map the type to the corresponding model class
+        $rateableTypeMap = [
+            'restaurant' => 'App\Models\Restaurant',
+            'item' => 'App\Models\Item',
+        ];
+        if (!isset($rateableTypeMap[$type])) {
+            return ResponseHelper::error("Invalid rateable type.", 400);
+        }
+        // Get the authenticated user's ID from the token
+        $userId = $request->user()->id;
+        // Merge the user_id and rateable_type into the validated data
+        $validated = $request->validated();
+        $validated['user_id'] = $userId;
+        $validated['rateable_type'] = $rateableTypeMap[$type];
+        // Create the rating
+        $rating = Rating::create($validated);
         return ResponseHelper::success("Rating created successfully.", $rating, null, 201);
     }
 
@@ -42,9 +98,6 @@ class RatingController extends Controller
         }
         $rating->save();
 
-        // Update avg_rate for the associated entity
-        $this->updateAvgRate($rating);
-
         return ResponseHelper::success("Rating updated successfully.", $rating);
     }
 
@@ -55,39 +108,9 @@ class RatingController extends Controller
     {
         // Find the rating
         $rating = Rating::findOrFail($id);
-
-        // Store the rateable entity before deleting the rating
-        $rateable = $rating->rateable;
-
         // Delete the rating
         $rating->delete();
-
-        // Update avg_rate for the associated entity
-        if ($rateable) {
-            $this->updateAvgRateForEntity($rateable);
-        }
-
         return ResponseHelper::success("Rating deleted successfully.");
     }
 
-    /**
-     * Update the avg_rate for the associated entity (Restaurant or Item).
-     */
-    private function updateAvgRate(Rating $rating): void
-    {
-        $rateable = $rating->rateable; // Get the associated entity (Restaurant or Item)
-
-        if ($rateable) {
-            $this->updateAvgRateForEntity($rateable);
-        }
-    }
-
-    /**
-     * Update the avg_rate for a given entity (Restaurant or Item).
-     */
-    private function updateAvgRateForEntity($entity): void
-    {
-        $avgRate = $entity->ratings()->avg('rating') ?? 0; // Calculate the average rating
-        $entity->update(['avg_rate' => $avgRate]); // Update the avg_rate column
-    }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Rating extends Model
 {
@@ -32,10 +33,9 @@ class Rating extends Model
     /**
      * Boot the model and register event listeners.
      */
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
-
         // Recalculate avgRate when a rating is created
         static::created(function ($rating) {
             $rating->updateAvgRate();
@@ -43,6 +43,11 @@ class Rating extends Model
 
         // Recalculate avgRate when a rating is updated
         static::updated(function ($rating) {
+            $rating->updateAvgRate();
+        });
+
+        // Recalculate avgRate when a rating is deleted
+        static::deleted(function ($rating) {
             $rating->updateAvgRate();
         });
     }
@@ -57,12 +62,11 @@ class Rating extends Model
         if (!$rateable) {
             return; // Exit early if the rateable entity doesn't exist
         }
-
         $avgRate = $rateable->ratings()->avg('rating') ?? 0; // Calculate the average rating
-
         // Only update if the avg_rate has changed
         if ($rateable->avg_rate !== $avgRate) {
-            $rateable->update(['avg_rate' => $avgRate]);
+            $rateable->avg_rate =$avgRate;
+            $rateable->save();
         }
     }
 }

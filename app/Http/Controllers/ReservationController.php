@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateReservationRequest;
 use App\Helpers\ResponseHelper;
 use App\Models\Reservations;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class ReservationController extends Controller
@@ -19,7 +20,7 @@ class ReservationController extends Controller
     public function index(): JsonResponse
     {
         $reservations = Reservations::all();
-        return ResponseHelper::success("Reservations retrieved successfully.",null, $reservations);
+        return ResponseHelper::success("Reservations retrieved successfully.", null, $reservations);
     }
 
     /**
@@ -30,8 +31,11 @@ class ReservationController extends Controller
      */
     public function store(ReservationRequest $request): JsonResponse
     {
-        $reservation = Reservations::create($request->validated());
-        return ResponseHelper::success("Reservation created successfully.",null, $reservation, 201);
+        $user = Auth::user();
+        $validated = $request->validated();
+        $validated['user_id'] = $user->id;
+        $reservation = Reservations::create($validated);
+        return ResponseHelper::success("Reservation created successfully.", null, $reservation, null,201);
     }
 
     /**

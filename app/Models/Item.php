@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\WithUserRatings;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -9,6 +10,7 @@ use Illuminate\Support\Collection;
 
 class Item extends Generic
 {
+    use  WithUserRatings;
     protected $fillable = [
         'name',
         'description',
@@ -34,6 +36,13 @@ class Item extends Generic
     public function ratings(): MorphMany
     {
         return $this->morphMany(Rating::class, 'rateable');
+    }
+
+    public static function search(?array $filters): array
+    {
+        $results = parent::search($filters);
+        $results['items'] = self::addUserRatings($results['items']);
+        return $results;
     }
 
 }

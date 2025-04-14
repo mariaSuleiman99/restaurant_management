@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->integer("capacity");
             $table->string("number")->unique();
+            $table->enum('status', ['available', 'reserved'])->default('available'); // Table status
             $table->foreignIdFor(Restaurant::class)->constrained();
             $table->timestamps();
         });
