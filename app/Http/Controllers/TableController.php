@@ -8,6 +8,7 @@ use App\Models\Restaurant;
 use App\Models\Table;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use PhpParser\Node\Expr\List_;
 
 class TableController extends Controller
@@ -108,5 +109,14 @@ class TableController extends Controller
 
         // Return success response with the list of tables
         return ResponseHelper::success("Tables retrieved successfully.",null, $tables);
+    }
+    public function search(Request $request): JsonResponse
+    {
+        // Call the search method and get the results
+        $searchResults = Table::search($request->all());
+        // Extract items and total count
+        $tables = $searchResults['items'];
+        $totalCount = $searchResults['total_count'];
+        return ResponseHelper::success("Tables retrieved successfully.", null, $tables, $totalCount);
     }
 }

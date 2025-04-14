@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Reservations extends Model
+class Reservations extends Generic
 {
     protected $fillable = [
         'date', 'duration','user_id','table_id'

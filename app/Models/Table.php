@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
-class Table extends Model
+class Table extends Generic
 {
     use HasFactory;
     protected $fillable = [

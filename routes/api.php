@@ -17,7 +17,14 @@ Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
 });
-// Routes accessible to both admin and user
+
+Route::post('/upload', [ImageController::class, 'store']);
+
+Route::prefix('ratings')->group(function () {
+    Route::post('/', [RatingController::class, 'store']); // add rating
+    Route::put('/{id}', [RatingController::class, 'update']); // update rating
+//            Route::get('/{id}', [RatingController::class, 'show']); // Get a single rating
+});
 Route::prefix('restaurants')->group(function () {
     Route::get('/', [RestaurantController::class, 'index']); // List all restaurants
     Route::get('/search', [RestaurantController::class, 'search']); // Search restaurants
@@ -43,7 +50,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin-only routes
 
     Route::middleware("role:System_Admin|Restaurant_Admin")->group(function () {
-        Route::post('/upload', [ImageController::class, 'store']);
 
         Route::prefix('restaurants')->group(function () {
 //            Route::post('/', [RestaurantController::class, 'store']); // Create a new restaurant
@@ -77,12 +83,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware("role:User|Restaurant_Admin")->group(function () {
         Route::prefix('tables')->group(function () {
             Route::get('/', [TableController::class, 'index']); // List all tables
+            Route::get('/search', [TableController::class, 'search']); // Get a single table
             Route::get('/{id}', [TableController::class, 'show']); // Get a single table
             Route::get('/by-restaurant/{id}', [TableController::class, 'getTablesByRestaurantId']); // Get tables by restaurant
         });
         Route::prefix('reservations')->group(function () {
             Route::get('/', [ReservationController::class, 'index']); // List all reservations
             Route::post('/', [ReservationController::class, 'store']); // Create a reservation
+            Route::get('/search', [ReservationController::class, 'search']); // Get a single reservation
             Route::get('/{id}', [ReservationController::class, 'show']); // Get a single reservation
         });
 

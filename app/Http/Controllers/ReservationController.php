@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateReservationRequest;
 use App\Helpers\ResponseHelper;
 use App\Models\Reservations;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ReservationController extends Controller
 {
@@ -85,5 +86,14 @@ class ReservationController extends Controller
 
         $reservation->delete();
         return ResponseHelper::success("Reservation deleted successfully.");
+    }
+    public function search(Request $request): JsonResponse
+    {
+        // Call the search method and get the results
+        $searchResults = Reservations::search($request->all());
+        // Extract items and total count
+        $reservation = $searchResults['items'];
+        $totalCount = $searchResults['total_count'];
+        return ResponseHelper::success("Reservations retrieved successfully.", null, $reservation, $totalCount);
     }
 }
