@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Reservations extends Model
 {
     protected $fillable = [
-        'date', 'duration','user_id','table_id','start_time','end_time'
+        'date', 'duration','user_id','table_id','start_time','end_time','status'
     ];
 
     function user(): BelongsTo
@@ -40,5 +40,15 @@ class Reservations extends Model
             $startDateTime = Carbon::parse("{$reservation->date} {$reservation->start_time}");
             $reservation->end_time = $startDateTime->addMinutes($reservation->duration)->format('H:i:s');
         });
+    }
+    /**
+     * Scope to filter reservations by table ID and date (today or later).
+     */
+    public function scopeForTableFromToday($query, $tableId)
+    {
+        return $query
+            ->where('table_id', $tableId)
+            ->where('date', '>=', now()->toDateString())
+            ->with('user'); // Eager load the user relationship
     }
 }

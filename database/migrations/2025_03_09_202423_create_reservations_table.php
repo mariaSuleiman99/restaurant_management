@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->Time('start_time');
             $table->Time('end_time');
             $table->integer("duration");
+            $table->enum("status", ['Pending','Approved', 'Rejected'])->default('Pending');
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Table::class)->constrained()->cascadeOnDelete();
             $table->timestamps();

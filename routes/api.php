@@ -79,6 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('reservations')->group(function () {
             Route::get('/', [ReservationController::class, 'index']); // List all reservations
             Route::post('/', [ReservationController::class, 'store']); // Create a reservation
+            Route::get('/table/{tableId}', [ReservationController::class, 'getReservationsByTable']);
             Route::get('/{id}', [ReservationController::class, 'show']); // Get a single reservation
         });
 

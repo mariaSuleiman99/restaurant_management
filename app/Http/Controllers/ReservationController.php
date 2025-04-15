@@ -35,7 +35,7 @@ class ReservationController extends Controller
         $validated = $request->validated();
         $validated['user_id'] = $user->id;
         $reservation = Reservations::create($validated);
-        return ResponseHelper::success("Reservation created successfully.", null, $reservation, null,201);
+        return ResponseHelper::success("Reservation created successfully.", null, $reservation, null, 201);
     }
 
     /**
@@ -90,5 +90,17 @@ class ReservationController extends Controller
 
         $reservation->delete();
         return ResponseHelper::success("Reservation deleted successfully.");
+    }
+
+    /**
+     * Get reservations for a specific table starting from today's date.
+     */
+    public function getReservationsByTable(int $tableId): JsonResponse
+    {
+        // Retrieve reservations using the scope
+        $reservations = Reservations::forTableFromToday($tableId)->get();
+
+        // Return response
+        return ResponseHelper::success("Reservations retrieved successfully.",null,$reservations);
     }
 }
