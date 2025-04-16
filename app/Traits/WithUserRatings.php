@@ -8,7 +8,8 @@ trait WithUserRatings
 {
     public static function addUserRatings($results)
     {
-        $user = Auth::user();
+//        $user = Auth::user();
+        $user = Auth::guard('sanctum')->user(); // Change 'sanctum' based on your authentication setup
         if ($user) {
             $results = collect($results)->map(function ($model) use ($user) {
                 $userRating = $model->ratings()

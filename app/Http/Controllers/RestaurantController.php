@@ -9,6 +9,7 @@ use App\Models\Restaurant;
 use App\Helpers\ResponseHelper;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -72,7 +73,7 @@ class RestaurantController extends Controller
         }
 
         // Get the authenticated user
-        $user = auth()->user();
+        $user = Auth::guard('sanctum')->user(); // Change 'sanctum' based on your authentication setup
 
         // Fetch the user's rating for this restaurant (efficient database query)
         $userRating = null;
@@ -81,14 +82,14 @@ class RestaurantController extends Controller
                 ->where('user_id', $user->id)
                 ->value('rating'); // Efficiently fetch only the rating value
         }
-
+        $restaurant['user_rating']=$userRating;
         // Prepare the response data
-        $responseData = [
-            'restaurant' => $restaurant,
-            'user_rating' => $userRating, // Include the user's rating
-        ];
+//        $responseData = [
+//            'restaurant' => $restaurant,
+//            'user_rating' => $userRating, // Include the user's rating
+//        ];
 
-        return ResponseHelper::success("Restaurant retrieved successfully.", $responseData);
+        return ResponseHelper::success("Restaurant retrieved successfully.", $restaurant);
     }
 
     /**

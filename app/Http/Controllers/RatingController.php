@@ -78,7 +78,15 @@ class RatingController extends Controller
         $validated['user_id'] = $userId;
         $validated['rateable_type'] = $rateableTypeMap[$type];
         // Create the rating
-        $rating = Rating::create($validated);
+        $rating =
+            Rating::where("user_id", $userId)->
+                    where('rateable_id', $validated['rateable_id'])->
+                    where('rateable_type', $validated['rateable_type'])->
+                    first();
+        if ($rating)
+            $rating->update(['rating' => $validated['rating']]);
+        else
+            $rating = Rating::create($validated);
         return ResponseHelper::success("Rating created successfully.", $rating, null, 201);
     }
 
