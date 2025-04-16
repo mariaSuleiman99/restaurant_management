@@ -11,7 +11,7 @@ class Reservations extends Generic
 {
     use WithReservationRestaurants;
     protected $fillable = [
-        'date', 'duration','user_id','table_id','start_time','end_time'
+        'date', 'duration','user_id','table_id','start_time','end_time','status'
     ];
 
     function user(): BelongsTo
@@ -48,5 +48,15 @@ class Reservations extends Generic
         $results = parent::search($filters);
         $results['items'] = self::addReservationRestaurants($results['items']);
         return $results;
+    }
+    /**
+     * Scope to filter reservations by table ID and date (today or later).
+     */
+    public function scopeForTableFromToday($query, $tableId)
+    {
+        return $query
+            ->where('table_id', $tableId)
+            ->where('date', '>=', now()->toDateString())
+            ->with('user'); // Eager load the user relationship
     }
 }
