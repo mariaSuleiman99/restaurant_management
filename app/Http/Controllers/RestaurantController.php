@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateRestaurantRequest;
 use App\Models\Restaurant;
 use App\Helpers\ResponseHelper;
 use App\Models\User;
+use App\Traits\SendEmail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +17,8 @@ use Spatie\Permission\Models\Role;
 
 class RestaurantController extends Controller
 {
+    use SendEmail;
+
     /**
      * Display a listing of all restaurants.
      *
@@ -82,7 +85,7 @@ class RestaurantController extends Controller
                 ->where('user_id', $user->id)
                 ->value('rating'); // Efficiently fetch only the rating value
         }
-        $restaurant['user_rating']=$userRating;
+        $restaurant['user_rating'] = $userRating;
         // Prepare the response data
 //        $responseData = [
 //            'restaurant' => $restaurant,
@@ -112,7 +115,7 @@ class RestaurantController extends Controller
 
         // Update the restaurant with validated data
         $restaurant->update($validatedData);
-        $this->register($request,$restaurant["id"], $restaurant['email_address']);
+        $this->register($request, $restaurant["id"], $restaurant['email_address']);
         // Return success response with the updated restaurant
         return ResponseHelper::success("Restaurant updated successfully.", $restaurant);
     }
@@ -140,7 +143,7 @@ class RestaurantController extends Controller
         return ResponseHelper::success("Restaurant deleted successfully.");
     }
 
-    private function register($request,$restaurantId, $email_address)
+    private function register($request, $restaurantId, $email_address)
     {
         $defaultRole = Role::where('name', 'Restaurant_Admin')->first();
         // Create the user
@@ -152,7 +155,13 @@ class RestaurantController extends Controller
         ]);
         $user->assignRole($defaultRole);
         $message = "Your Credentials are Username: " . $request['email'] . "\nPassword:" . $request['password'];
-     //   $this->notifyUser($message, $email_address);
+        //   $this->notifyUser($message, $email_address);
+        $details = [
+            'email' => $request['email'],
+            'userName' => $request['name'],
+            'message' => $message
+        ];
+        $this->sendEmail($details);
         return ResponseHelper::success("User registered successfully.", $user);
     }
 
