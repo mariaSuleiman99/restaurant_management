@@ -26,8 +26,9 @@ class AuthController extends Controller
             $role = $user->getRoleNames()->first(); // Returns the first role (single role)
             $user["role"] = $role;
 //            $user["user_role"] = $user->role->name; // Assuming the 'roles' table has a 'name' column
-
-            $token = $user->createToken('authToken')->plainTextToken;
+            $expiryTime = now()->addHours(24); // Token expires in 24 hours
+            $token = $user->createToken('authToken', ["*"], $expiryTime)->plainTextToken;
+//            $token = $user->createToken('authToken')->plainTextToken;
 
             $user['token'] = $token;
             return ResponseHelper::success("Login successfully", $user)->withHeaders([
