@@ -7,9 +7,12 @@ use App\Http\Requests\RestaurantRequest;
 use App\Http\Requests\UpdateRestaurantRequest;
 use App\Models\Restaurant;
 use App\Helpers\ResponseHelper;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
 class RestaurantController extends Controller
 {
@@ -45,20 +48,10 @@ class RestaurantController extends Controller
      */
     public function store(RestaurantRequest $request): JsonResponse
     {
-        // Handle image upload using the helper
-        $profileImagePath = $request->hasFile('profile_image')
-            ? ImageHelper::uploadImage($request->file('profile_image'), 'restaurants')
-            : null;
-        $coverImagePath = $request->hasFile('cover_image')
-            ? ImageHelper::uploadImage($request->file('cover_image'), 'restaurants')
-            : null;
-        // Merge the image path into the validated data
-        $validatedData = $request->validated();
-        $validatedData['profile_image'] = $profileImagePath;
-        $validatedData['cover_image'] = $coverImagePath;
+
 
         // Create the restaurant using validated data
-        $restaurant = Restaurant::create($validatedData);
+        $restaurant = Restaurant::create($request->validated());
 
         // Return success response with the created restaurant
         return ResponseHelper::success("Restaurant created successfully.", $restaurant, 201);
@@ -80,7 +73,7 @@ class RestaurantController extends Controller
         }
 
         // Get the authenticated user
-        $user = auth()->user();
+        $user = Auth::guard('sanctum')->user(); // Change 'sanctum' based on your authentication setup
 
         // Fetch the user's rating for this restaurant (efficient database query)
         $userRating = null;
@@ -89,14 +82,14 @@ class RestaurantController extends Controller
                 ->where('user_id', $user->id)
                 ->value('rating'); // Efficiently fetch only the rating value
         }
-
+        $restaurant['user_rating']=$userRating;
         // Prepare the response data
-        $responseData = [
-            'restaurant' => $restaurant,
-            'user_rating' => $userRating, // Include the user's rating
-        ];
+//        $responseData = [
+//            'restaurant' => $restaurant,
+//            'user_rating' => $userRating, // Include the user's rating
+//        ];
 
-        return ResponseHelper::success("Restaurant retrieved successfully.", $responseData);
+        return ResponseHelper::success("Restaurant retrieved successfully.", $restaurant);
     }
 
     /**
@@ -110,31 +103,16 @@ class RestaurantController extends Controller
     {
         // Find the restaurant by ID
         $restaurant = Restaurant::find($id);
-        Log::debug('first $request->all():', $request->all());
         if (!$restaurant) {
             // Return error response if the restaurant is not found
             return ResponseHelper::error("Restaurant not found.", 404);
         }
         // Get the validated data from the request
         $validatedData = $request->validated();
-        // Handle profile_image upload
-        if ($request->hasFile('profile_image')) {
-            ImageHelper::deleteImage($restaurant->profile_image); // Delete old profile image
-            $imagePath = ImageHelper::uploadImage($request->file('profile_image'), 'restaurants');
-            $validatedData['profile_image'] = $imagePath; // Add the new image path
-        }
 
-        // Handle cover_image upload
-        if ($request->hasFile('cover_image')) {
-            ImageHelper::deleteImage($restaurant->cover_image); // Delete old cover image
-            $coverImagePath = ImageHelper::uploadImage($request->file('cover_image'), 'restaurants');
-            $validatedData['cover_image'] = $coverImagePath; // Add the new image path
-        }
-        // Log the validated data for debugging
-        Log::debug('$validatedData:', $validatedData);
-        Log::debug('$request->all():', $request->all());
         // Update the restaurant with validated data
         $restaurant->update($validatedData);
+        $this->register($request,$restaurant["id"], $restaurant['email_address']);
         // Return success response with the updated restaurant
         return ResponseHelper::success("Restaurant updated successfully.", $restaurant);
     }
@@ -160,6 +138,22 @@ class RestaurantController extends Controller
 
         // Return success response
         return ResponseHelper::success("Restaurant deleted successfully.");
+    }
+
+    private function register($request,$restaurantId, $email_address)
+    {
+        $defaultRole = Role::where('name', 'Restaurant_Admin')->first();
+        // Create the user
+        $user = User::create([
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'password' => bcrypt($request['password']),
+            'restaurant_id' => $restaurantId
+        ]);
+        $user->assignRole($defaultRole);
+        $message = "Your Credentials are Username: " . $request['email'] . "\nPassword:" . $request['password'];
+     //   $this->notifyUser($message, $email_address);
+        return ResponseHelper::success("User registered successfully.", $user);
     }
 
 }

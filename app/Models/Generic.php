@@ -14,10 +14,15 @@ class Generic extends Model
      * @param array|null $filters Key-value pairs for search terms (e.g., ['name' => 'Pizza', 'location' => 'New York'])
      * @return array
      */
+    public static  $mainQuery;
+
     public static function search(?array $filters): array
     {
         // Start with a base query
-        $query = self::query();
+        if (self::$mainQuery != null)
+            $query = self::$mainQuery;
+        else
+            $query = self::query();
 
         // Check if filters are provided and not empty
         if (!empty($filters)) {
@@ -32,7 +37,7 @@ class Generic extends Model
                     $columnType = Schema::getColumnType($table, $field);
 
                     // Apply the appropriate condition based on the column type
-                    if (str_contains($columnType, 'string') || str_contains($columnType, 'text')) {
+                    if (str_contains($columnType, 'string') || str_contains($columnType, 'text') || str_contains($columnType, 'varchar')) {
                         // Use LIKE for string/text columns
                         $query->where($field, 'LIKE', "%{$value}%");
                     } else {
@@ -42,6 +47,7 @@ class Generic extends Model
                 }
             }
         }
+        $query->orderBy('created_at','Desc');
         // Extract pagination parameters from the request (no defaults)
         $page = request()->input('page');
         $perPage = request()->input('per_page');

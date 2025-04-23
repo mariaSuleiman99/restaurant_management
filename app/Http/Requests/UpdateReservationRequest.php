@@ -23,6 +23,7 @@ class UpdateReservationRequest extends FormRequest
             'date' => 'sometimes|date', // Only validate if present
             'duration' => 'sometimes|integer|min:1', // Only validate if present
             'user_id' => 'sometimes|exists:users,id', // Only validate if present
+            'status' => 'sometimes|in:Pending,Approved,Rejected', // Only validate if present
             'table_id' => [
                 'sometimes', // Only validate if present
                 Rule::unique('reservations', 'table_id')

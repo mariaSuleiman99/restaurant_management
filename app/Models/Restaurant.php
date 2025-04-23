@@ -13,7 +13,7 @@ class Restaurant extends Generic
 
     protected $fillable = [
         'name', 'mobile_number', 'description', 'location',
-        'profile_image', 'cover_image'
+        'profile_image', 'cover_image','status','email_address'
     ];
 
     function tables(): HasMany

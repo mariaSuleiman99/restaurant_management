@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -18,8 +19,8 @@ class OrderController extends Controller
      */
     public function index(): JsonResponse
     {
-        $orders = Order::all();
-        return ResponseHelper::success("Orders retrieved successfully.",null, $orders);
+        $orders = Order::where("status", "<>", "InCart")->get();
+        return ResponseHelper::success("Orders retrieved successfully.", null, $orders);
     }
 
     /**
@@ -31,7 +32,8 @@ class OrderController extends Controller
     public function store(OrderRequest $request): JsonResponse
     {
         $order = Order::create($request->validated());
-        return ResponseHelper::success("Order created successfully.",null, $order, 201);
+        $this->syncOrderItems($request, $order);
+        return ResponseHelper::success("Order created successfully.", null, $order, 201);
     }
 
     /**
@@ -42,7 +44,7 @@ class OrderController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $order = Order::find($id);
+        $order = Order::with('orderItems.item')->find($id);
 
         if (!$order) {
             return ResponseHelper::error("Order not found.", 404);
@@ -65,8 +67,9 @@ class OrderController extends Controller
         if (!$order) {
             return ResponseHelper::error("Order not found.", 404);
         }
-
+        $this->syncOrderItems($request, $order);
         $order->update($request->validated());
+
         return ResponseHelper::success("Order updated successfully.", $order);
     }
 
@@ -97,13 +100,35 @@ class OrderController extends Controller
         }
 
         $orders = Order::byStatus($status);
-
         if ($orders->isEmpty()) {
-            return ResponseHelper::success("No orders found for the given status.",null, []);
+            return ResponseHelper::success("No orders found for the given status.", null, []);
         }
 
-        return ResponseHelper::success("Orders retrieved successfully.",null, $orders);
+        return ResponseHelper::success("Orders retrieved successfully.", null, $orders);
     }
+
+    public function getUserCart(): JsonResponse
+    {
+        $user = Auth::user();
+        $orders = Order::getCart($user->getAuthIdentifier());
+        if ($orders->isEmpty()) {
+            return ResponseHelper::success("No Cart found for the given status.", null, []);
+        }
+
+        return ResponseHelper::success("Cart retrieved successfully.", null, $orders);
+    }
+
+    public function getUserOrders(): JsonResponse
+    {
+        $user = Auth::user();
+        $orders = Order::getUserOrders($user->getAuthIdentifier());
+        if ($orders->isEmpty()) {
+            return ResponseHelper::success("No Cart found for the given status.", null, []);
+        }
+
+        return ResponseHelper::success("Cart retrieved successfully.", null, $orders);
+    }
+
     public function updateStatus(int $id, Request $request): JsonResponse
     {
         // Validate the request
@@ -132,6 +157,22 @@ class OrderController extends Controller
         // Extract items and total count
         $orders = $searchResults['items'];
         $totalCount = $searchResults['total_count'];
-        return ResponseHelper::success("Orders retrieved successfully.", null, $orders,$totalCount);
+        return ResponseHelper::success("Orders retrieved successfully.", null, $orders, $totalCount);
+    }
+
+    function syncOrderItems($request, $order): void
+    {
+        if (!$request->has('order_items')) return;
+        $orderItems = $request->input('order_items');
+
+        foreach ($orderItems as $itemData) {
+            if (isset($itemData['id'])) {
+                $orderItem = $order->orderItems()->find($itemData['id']);
+                if ($orderItem)
+                    $orderItem->update($itemData);
+            } else
+                $order->orderItems()->create($itemData);
+        }
+        $order->updatePrice($order['id']);
     }
 }

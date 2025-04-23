@@ -33,8 +33,9 @@ class UpdateRestaurantRequest extends BaseRequest
             ],
             'description' => 'nullable|string', // Optional long text description
             'location' => 'nullable|string|max:255', // Optional location
-            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
+            'status' => 'string|max:255', // Optional location
+//            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
+//            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
         ];
     }
 

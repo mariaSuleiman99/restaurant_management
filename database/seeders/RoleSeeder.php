@@ -15,12 +15,12 @@ class RoleSeeder extends Seeder
     {
         Role::create([
             'id' =>1,
-            'name' => 'System Admin',
+            'name' => 'System_Admin',
             'guard_name' => 'api',
         ]);
         Role::create([
             'id' =>2,
-            'name' => 'Restaurant Admin',
+            'name' => 'Restaurant_Admin',
             'guard_name' => 'api',
         ]);
         Role::create([

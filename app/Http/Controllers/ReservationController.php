@@ -6,9 +6,9 @@ use App\Http\Requests\ReservationRequest;
 use App\Http\Requests\UpdateReservationRequest;
 use App\Helpers\ResponseHelper;
 use App\Models\Reservations;
-use http\Client\Curl\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class ReservationController extends Controller
 {
@@ -102,5 +102,19 @@ class ReservationController extends Controller
 
         // Return response
         return ResponseHelper::success("Reservations retrieved successfully.",null,$reservations);
+    }
+    public function search(Request $request): JsonResponse
+    {
+        // Call the search method and get the results
+        $searchResults = Reservations::search($request->all());
+        // Extract items and total count
+        $reservation = $searchResults['items'];
+        $totalCount = $searchResults['total_count'];
+        return ResponseHelper::success("Reservations retrieved successfully.", null, $reservation, $totalCount);
+    }
+    public function restaurantsVisits(): JsonResponse
+    {
+        $restaurantsVisits= Reservations::restaurantsVisits();
+        return ResponseHelper::success("Reservations retrieved successfully.", null, $restaurantsVisits, null);
     }
 }

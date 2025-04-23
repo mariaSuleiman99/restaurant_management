@@ -9,7 +9,9 @@ use App\Http\Requests\UpdateTableRequest;
 use App\Models\Restaurant;
 use App\Models\Table;
 use App\Helpers\ResponseHelper;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use PhpParser\Node\Expr\List_;
 
 class TableController extends Controller
@@ -120,12 +122,17 @@ class TableController extends Controller
     {
         // Extract request data
         $date = $request->input('date');
+        $restaurant_id = $request->input('restaurant_id');
         $start_time = $request->input('start_time');
-        $end_time = $request->input('end_time');
+
+        $duration = intval($request->input('duration'));
+        $startDateTime = Carbon::parse("$date $start_time");
+        $end_time = $startDateTime->addHours($duration)->format('H:i:s');
+
         $people_count = $request->input('people_count');
 
         // Query available tables
-        $availableTables = Table::available($date, $start_time, $end_time, $people_count)->get();
+        $availableTables = Table::available($restaurant_id,$date, $start_time, $end_time, $people_count)->get();
 
         // Return response
         return ResponseHelper::success(
@@ -152,5 +159,14 @@ class TableController extends Controller
             'message' => 'Table status updated successfully.',
             'data' => $table,
         ]);
+    }
+    public function search(Request $request): JsonResponse
+    {
+        // Call the search method and get the results
+        $searchResults = Table::search($request->all());
+        // Extract items and total count
+        $tables = $searchResults['items'];
+        $totalCount = $searchResults['total_count'];
+        return ResponseHelper::success("Tables retrieved successfully.", null, $tables, $totalCount);
     }
 }

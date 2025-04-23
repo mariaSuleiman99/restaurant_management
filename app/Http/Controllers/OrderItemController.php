@@ -77,13 +77,13 @@ class OrderItemController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $orderItem = OrderItem::find($id);
+         $orderItem = OrderItem::find($id);
 
         if (!$orderItem) {
             return ResponseHelper::error("Order item not found.", 404);
         }
-
         $orderItem->delete();
+        $orderItem->order()->first()->updatePrice( $orderItem->order()->first()['id']);
         return ResponseHelper::success("Order item deleted successfully.");
     }
     /**

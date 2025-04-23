@@ -16,7 +16,7 @@ class TableAvailabilityRequest extends BaseRequest
         return [
             'date' => 'required|date',
             'start_time' => 'required|date_format:H:i:s',
-            'end_time' => 'required|date_format:H:i:s|after:start_time',
+//            'end_time' => 'required|date_format:H:i:s|after:start_time',
             'people_count' => 'required|integer|min:1',
         ];
     }

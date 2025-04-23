@@ -25,7 +25,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-//        'role_id'
+//        'role_id',
+        'restaurant_id'
     ];
 
     /**
@@ -57,6 +58,10 @@ class User extends Authenticatable
     function restaurant(): BelongsTo
     {
         return $this->belongsTo(Restaurant::class);
+    }
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
     }
 
     function reservations(): HasMany

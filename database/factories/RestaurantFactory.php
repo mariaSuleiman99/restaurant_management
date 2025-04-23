@@ -17,10 +17,11 @@ class RestaurantFactory extends Factory
     public function definition(): array
     {
         return [
-            'name'=> fake()->unique()->name(),
+            'name' => fake()->unique()->name(),
             'mobile_number' => fake()->regexify('^\+?[0-9]{10}$'),
-            'description'=>fake()->paragraph(),
-            'location' =>fake()->address()
+            'description' => fake()->paragraph(),
+            'location' => fake()->address(),
+            'status' => 'Pending'
         ];
     }
 }
