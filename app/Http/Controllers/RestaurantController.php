@@ -112,7 +112,7 @@ class RestaurantController extends Controller
 
         // Update the restaurant with validated data
         $restaurant->update($validatedData);
-        $this->register($request,$restaurant["id"]);
+        $this->register($request,$restaurant["id"], $restaurant['email_address']);
         // Return success response with the updated restaurant
         return ResponseHelper::success("Restaurant updated successfully.", $restaurant);
     }
@@ -140,7 +140,7 @@ class RestaurantController extends Controller
         return ResponseHelper::success("Restaurant deleted successfully.");
     }
 
-    private function register($request,$restaurantId)
+    private function register($request,$restaurantId, $email_address)
     {
         $defaultRole = Role::where('name', 'Restaurant_Admin')->first();
         // Create the user
@@ -151,6 +151,8 @@ class RestaurantController extends Controller
             'restaurant_id' => $restaurantId
         ]);
         $user->assignRole($defaultRole);
+        $message = "Your Credentials are Username: " . $request['email'] . "\nPassword:" . $request['password'];
+     //   $this->notifyUser($message, $email_address);
         return ResponseHelper::success("User registered successfully.", $user);
     }
 

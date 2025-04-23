@@ -112,4 +112,9 @@ class ReservationController extends Controller
         $totalCount = $searchResults['total_count'];
         return ResponseHelper::success("Reservations retrieved successfully.", null, $reservation, $totalCount);
     }
+    public function restaurantsVisits(): JsonResponse
+    {
+        $restaurantsVisits= Reservations::restaurantsVisits();
+        return ResponseHelper::success("Reservations retrieved successfully.", null, $restaurantsVisits, null);
+    }
 }

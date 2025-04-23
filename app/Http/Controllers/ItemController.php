@@ -114,4 +114,10 @@ class ItemController extends Controller
         $totalCount = $searchResults['total_count'];
         return ResponseHelper::success("Items retrieved successfully.", null, $items,$totalCount);
     }
+    public function ItemsOrders($restaurantId): JsonResponse
+    {
+        $ItemsOrders=Item::itemsOrders($restaurantId);
+
+        return ResponseHelper::success("Items retrieved successfully.", null, $ItemsOrders);
+    }
 }

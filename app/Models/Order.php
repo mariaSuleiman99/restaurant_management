@@ -32,7 +32,7 @@ class Order extends Generic
         return self::where('user_id', $userId)->where('status', 'InCart')->with('orderItems.item')->get();
     }   public static function getUserOrders(int $userId): Collection
     {
-        return self::where('user_id', $userId)->where('status','<>', 'InCart')->with('orderItems.item')->get();
+        return self::where('user_id', $userId)->where('status', '<>', 'InCart')->with('orderItems.item')->OrderBy('created_at','DESC')->get();
     }
 
     public function updatePrice($id): void
@@ -51,4 +51,24 @@ class Order extends Generic
         $order['count'] = $totalCount;
         $order->update();
     }
+
+    static function search(?array $filters): array
+    {
+        self::$mainQuery = self::query();
+
+        if (in_array('restaurant_id', $filters)) {
+            error_log('restaurant_id');
+            $restaurantId = $filters['restaurant_id'];
+            self::$mainQuery->whereHas('orderItems', function ($query) use ($restaurantId) {
+                $query->whereHas('item', function ($subQuery) use ($restaurantId) {
+                    $subQuery->where('restaurant_id', $restaurantId);
+                });
+            });
+        }
+        self::$mainQuery->with('orderItems.item');
+        $results = parent::search($filters);
+        return $results;
+    }
+
+
 }

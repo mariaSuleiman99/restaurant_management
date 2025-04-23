@@ -4,8 +4,9 @@ namespace App\Models;
 
 use App\Traits\WithReservationRestaurants;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class Reservations extends Generic
 {
@@ -45,8 +46,15 @@ class Reservations extends Generic
     }
     public static function search(?array $filters): array
     {
+        self::$mainQuery = self::query();
+        if (array_key_exists('restaurant_id', $filters)) {
+            $restaurantId = $filters['restaurant_id'];
+            self::$mainQuery->whereHas('table', function ($query) use ($restaurantId) {
+                $query->where('restaurant_id', $restaurantId);
+            });
+        }
+        self::$mainQuery->with('table.restaurant')->with('user');
         $results = parent::search($filters);
-        $results['items'] = self::addReservationRestaurants($results['items']);
         return $results;
     }
     /**
@@ -57,6 +65,19 @@ class Reservations extends Generic
         return $query
             ->where('table_id', $tableId)
             ->where('date', '>=', now()->toDateString())
-            ->with('user'); // Eager load the user relationship
+            ->with('user')->OrderBy('created_at', 'DESC'); // Eager load the user relationship
+    }
+
+    public static function restaurantsVisits(): Collection
+    {
+        return self::query()
+            ->join('tables', 'tables.id', '=', 'reservations.table_id')
+            ->join('restaurants', 'restaurants.id', '=', 'tables.restaurant_id')
+            ->select([
+                    'restaurants.name as name',
+                    DB::raw('COUNT(tables.restaurant_id) as value')
+                ]
+            )
+            ->groupBy('restaurants.name')->get();
     }
 }

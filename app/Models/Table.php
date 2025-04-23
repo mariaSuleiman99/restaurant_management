@@ -32,14 +32,15 @@ class Table extends Generic
     /**
      * Scope to filter available tables based on status, time, and capacity.
      */
-    public function scopeAvailable($query, $date, $start_time, $end_time, $people_count)
+    public function scopeAvailable($query, $restaurant_id,$date, $start_time, $end_time, $people_count)
     {
         return $query
+            ->where('restaurant_id', $restaurant_id) // Only available tables
             ->where('status', 'available') // Only available tables
             ->where('capacity', '>=', $people_count) // Capacity must be sufficient
             ->whereDoesntHave('reservations', function ($q) use ($date, $start_time, $end_time) {
                 // Exclude tables reserved during the requested time period
-                $q->where('date', $date)
+                $q->whereNotIn('status', ['Pending', 'Rejected'])->where('date', $date)
                     ->where(function ($q) use ($start_time, $end_time) {
                         $q->whereBetween('start_time', [$start_time, $end_time])
                             ->orWhereBetween('end_time', [$start_time, $end_time])

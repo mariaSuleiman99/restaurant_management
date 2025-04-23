@@ -33,6 +33,7 @@ Route::prefix('restaurants')->group(function () {
 Route::prefix('items')->group(function () {
     Route::get('/', [ItemController::class, 'index']); // List all items
     Route::get('/search', [ItemController::class, 'search']); // Search items
+    Route::get('/items-orders/{restaurantId}', [ItemController::class, 'itemsOrders']); // Search items
     Route::get('/{id}', [ItemController::class, 'show']); // Get a single item
     Route::get('/restaurant/{restaurant}', [ItemController::class, 'getByRestaurantId']); // Get items by restaurant
 });
@@ -64,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('reservations')->group(function () {
             Route::put('/{id}', [ReservationController::class, 'update']); // Update a reservation
             Route::delete('/{id}', [ReservationController::class, 'destroy']); // Delete a reservation
+            Route::get('/restaurants-visits', [ReservationController::class, 'restaurantsVisits']);
         });
         Route::prefix('orders')->group(function () {
             Route::put('/status/{id}', [OrderController::class, 'updateStatus']); // Update order status
@@ -114,6 +116,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}', [OrderController::class, 'show']); // Get a single order
             Route::put('/{id}', [OrderController::class, 'update']); // Update order status
             Route::get('/status/{status}', [OrderController::class, 'getOrdersByStatus']); // Get orders by status
+            Route::get('/restaurant/{restaurantId}', [OrderController::class, 'byRestaurant']); // Get orders by status
         });
         Route::prefix('order-items')->group(function () {
             Route::get('/', [OrderItemController::class, 'index']); // List all order items

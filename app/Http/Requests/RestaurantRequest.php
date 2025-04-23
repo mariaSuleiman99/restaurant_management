@@ -17,6 +17,7 @@ class RestaurantRequest extends BaseRequest
         return [
             'mobile_number' => 'required|string|unique:restaurants,mobile_number|max:15', // Unique mobile number
             'name' => 'required|string|unique:restaurants,name|max:255', // Unique restaurant name
+            'email_address' => 'required|email|max:255', // Unique restaurant name
             'description' => 'nullable|string', // Optional long text description
             'location' => 'nullable|string|max:255', // Optional location
             'profile_image' => 'nullable|string', // Max 2MB,

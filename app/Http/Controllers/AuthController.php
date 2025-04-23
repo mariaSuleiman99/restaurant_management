@@ -61,6 +61,7 @@ class AuthController extends Controller
         $user["role"] = $role;
 
         $token = $user->createToken('authToken')->plainTextToken;
+        $user['token']=$token;
 
         return ResponseHelper::success("User registered successfully.", $user)->withHeaders([
             'Authorization' => 'Bearer ' . $token,
