@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\RegisterRequest;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -26,7 +29,7 @@ class AuthController extends Controller
 
             $token = $user->createToken('authToken')->plainTextToken;
 
-            $user['token']=$token;
+            $user['token'] = $token;
             return ResponseHelper::success("Login successfully", $user)->withHeaders([
                 'Authorization' => 'Bearer ' . $token,
             ]);
@@ -61,10 +64,46 @@ class AuthController extends Controller
         $user["role"] = $role;
 
         $token = $user->createToken('authToken')->plainTextToken;
-        $user['token']=$token;
+        $user['token'] = $token;
 
         return ResponseHelper::success("User registered successfully.", $user)->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ]);
+    }
+
+    /**
+     * Change the authenticated user's password.
+     */
+    public function changePassword(Request $request): JsonResponse
+    {
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        // Get the authenticated user
+        $user = $request->user();
+
+        // Check if the current password is correct
+        if (!Hash::check($request->input('current_password'), $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['The current password is incorrect.'],
+            ]);
+        }
+
+        // Update the user's password
+        $user->password = Hash::make($request->input('new_password'));
+        $user->save();
+
+        // Return success response
+        return ResponseHelper::success('Password changed successfully.');
     }
 }

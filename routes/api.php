@@ -43,7 +43,7 @@ Route::prefix('restaurants')->group(function () {
 
 // Protected routes (require authentication)
 Route::middleware('auth:sanctum')->group(function () {
-
+    Route::post('/change-password', [AuthController::class, 'changePassword']);
     // User route
     Route::get('/user', function (Request $request) {
         return $request->user();
