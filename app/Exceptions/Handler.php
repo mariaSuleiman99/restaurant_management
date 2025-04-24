@@ -16,8 +16,6 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        Log::info('Request Headers:', $request->headers->all());
-        Log::info('Expects JSON:', [$request->expectsJson()]);
         // Force JSON response for API routes
         if ($request->is('api/*')) {
             // Handle Authentication Exceptions (e.g., unauthenticated users)

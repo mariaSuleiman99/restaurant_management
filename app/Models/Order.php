@@ -30,9 +30,11 @@ class Order extends Generic
     public static function getCart(int $userId): Collection
     {
         return self::where('user_id', $userId)->where('status', 'InCart')->with('orderItems.item')->get();
-    }   public static function getUserOrders(int $userId): Collection
+    }
+
+    public static function getUserOrders(int $userId): Collection
     {
-        return self::where('user_id', $userId)->where('status', '<>', 'InCart')->with('orderItems.item')->OrderBy('created_at','DESC')->get();
+        return self::where('user_id', $userId)->where('status', '<>', 'InCart')->with('orderItems.item')->OrderBy('created_at', 'DESC')->get();
     }
 
     public function updatePrice($id): void
@@ -70,5 +72,31 @@ class Order extends Generic
         return $results;
     }
 
+    /**
+     * Calculate the total count of items in the order.
+     */
+    public function calculateTotalCount()
+    {
+        return $this->orderItems->sum('count');
+    }
 
+    /**
+     * Calculate the total price of the order.
+     */
+    public function calculateTotalPrice()
+    {
+        return $this->orderItems->sum(function ($item) {
+            return $item->count * $item->price;
+        });
+    }
+
+    /**
+     * Update the total_count and total_price in the database.
+     */
+    public function updateOrderTotals()
+    {
+        $this->count = $this->calculateTotalCount();
+        $this->total_price = $this->calculateTotalPrice();
+        $this->save();
+    }
 }
