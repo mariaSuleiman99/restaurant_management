@@ -5,6 +5,6 @@
 </head>
 <body>
 <h1>Hello, {{ $details['userName'] }}!</h1>
-<p>{{ $details['message'] }}</p>
+<p>{!! $details['message'] !!}</p>
 </body>
 </html>

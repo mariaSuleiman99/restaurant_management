@@ -18,6 +18,7 @@ class UpdateOrderRequest extends FormRequest
             'total_price' => 'sometimes|numeric|min:0', // Only validate if present
             'count' => 'sometimes|integer|min:1', // Only validate if present
             'status' => 'sometimes|in:InDelivery,InProcess,Pending,InCart', // Only validate if present
+            'order_items' => 'required|array', // Ensures "items" is an array
         ];
     }
     /**

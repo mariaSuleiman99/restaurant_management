@@ -9,8 +9,6 @@ use App\Helpers\ResponseHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use function Laravel\Prompts\error;
-use function Psy\debug;
 
 class OrderController extends Controller
 {
@@ -34,53 +32,9 @@ class OrderController extends Controller
      */
     public function store(OrderRequest $request): JsonResponse
     {
-        $validated = $request->validated();
-        // Retrieve the authenticated user
-        $user = Auth::user();
-        // Group order items by restaurant_id
-        $groupedItems = $this->groupItemsByRestaurant($validated['order_items']);
-
-        // Create separate orders for each restaurant
-        $orders = [];
-        foreach ($groupedItems as $restaurantId => $items) {
-            $orderData = $validated;
-            $orderData['order_items'] = $items;
-            $orderData['total_price'] = 0;
-            $orderData['user_id'] = $user->id;
-            $orderData['count'] = 0;
-            // Create the order
-            $order = Order::create($orderData);
-
-            // Sync order items
-            $this->syncOrderItems($request, $order);
-            // Update the total_count and total_price
-            $order->updateOrderTotals();
-            $orders[] = $order;
-        }
-
-        return ResponseHelper::success("Orders created successfully.", null, $orders, 201);
-    }
-
-    /**
-     * Group order items by restaurant_id.
-     */
-    private function groupItemsByRestaurant(array $items): array
-    {
-        $groupedItems = [];
-
-        foreach ($items as $itemData) {
-            $itemId = $itemData['item_id'];
-            $item = \App\Models\Item::find($itemId);
-
-            if (!$item) {
-                throw new \Exception("Item with ID {$itemId} not found.");
-            }
-
-            $restaurantId = $item->restaurant_id;
-            $groupedItems[$restaurantId][] = $itemData;
-        }
-
-        return $groupedItems;
+        $order = Order::create($request->validated());
+        $this->syncOrderItems($request, $order);
+        return ResponseHelper::success("Order created successfully.", null, $order, 201);
     }
 
     /**
@@ -115,19 +69,8 @@ class OrderController extends Controller
         if (!$order) {
             return ResponseHelper::error("Order not found.", 404);
         }
-
-        $validated = $request->validated();
-
-        // Validate that all items belong to the same restaurant
-        $this->validateOrderItemsForRestaurant($validated['order_items'], $order->restaurant_id);
-
-        // Sync order items
         $this->syncOrderItems($request, $order);
-
-        // Update the order
-        $order->update($validated);
-        // Update the total_count and total_price
-        $order->updateOrderTotals();
+        $order->update($request->validated());
 
         return ResponseHelper::success("Order updated successfully.", $order);
     }
@@ -224,72 +167,53 @@ class OrderController extends Controller
         if (!$request->has('order_items')) return;
 
         $orderItems = $request->input('order_items');
-        $user = Auth::user();
-
-        // Validate that all items belong to the same restaurant
-        $firstItemId = $orderItems[0]['item_id'] ?? null;
-        $firstItem = \App\Models\Item::find($firstItemId);
-
-        if (!$firstItem) {
-            throw new \Exception("First item in the order is invalid.");
-        }
-
-        $restaurantId = $firstItem->restaurant_id;
 
         foreach ($orderItems as $itemData) {
-            $itemId = $itemData['item_id'];
-            $item = \App\Models\Item::find($itemId);
-
-            if (!$item) {
-                throw new \Exception("Item with ID {$itemId} not found.");
-            }
-
-
-            // Update or create the order item
             if (isset($itemData['id'])) {
                 $orderItem = $order->orderItems()->find($itemData['id']);
                 if ($orderItem)
                     $orderItem->update($itemData);
-            } else {
+            } else
                 $order->orderItems()->create($itemData);
-            }
         }
-
-        // Update the order price
         $order->updatePrice($order['id']);
     }
 
-    /**
-     * Validate that all items belong to the same restaurant.
-     */
-    private function validateOrderItemsForRestaurant(array $items, int $restaurantId): void
+    public function submitCart(int $id): JsonResponse
     {
-        foreach ($items as $itemData) {
-            $itemId = $itemData['item_id'];
-            $item = \App\Models\Item::find($itemId);
-
-            if (!$item) {
-                throw new \Exception("Item with ID {$itemId} not found.");
-            }
-
-            if ($item->restaurant_id !== $restaurantId) {
-                throw new \Exception("All items in the order must belong to the same restaurant.");
-            }
+        // Find the order by ID
+        $order = Order::find($id);
+        if (!$order) {
+            return ResponseHelper::error("Order not found.", 404);
         }
+
+        $orderItems = $order->orderItems()->get();
+
+        $orders = collect();
+        foreach ($orderItems as $orderItem) {
+            $restaurant_id = $orderItem->item()->first()['restaurant_id'];
+            $restaurant_order = $orders->get($restaurant_id);
+            if (!$restaurant_order) {
+                $createdOrder = Order::create([
+                    'user_id' => $order['user_id'],
+                    'total_price' => $orderItem['price'],
+                    'count' => $orderItem['count'],
+                    'status' => 'Pending',
+                ]);
+                $orders->put($restaurant_id, $createdOrder['id']);
+                $restaurant_order = $createdOrder['id'];
+            } else {
+                $restaurantOrder = Order::find($restaurant_order);
+                $restaurantOrder->update([
+                    'count' => $restaurantOrder->count + $orderItem['count'],
+                    'total_price' => $restaurantOrder->total_price + $orderItem['price'],
+                ]);
+            }
+            $orderItem->update(['order_id' => $restaurant_order]);
+        }
+        $order->delete();
+        // Return success response
+        return ResponseHelper::success("Order status updated successfully.", $order);
     }
-//    function syncOrderItems($request, $order): void
-//    {
-//        if (!$request->has('order_items')) return;
-//        $orderItems = $request->input('order_items');
-//
-//        foreach ($orderItems as $itemData) {
-//            if (isset($itemData['id'])) {
-//                $orderItem = $order->orderItems()->find($itemData['id']);
-//                if ($orderItem)
-//                    $orderItem->update($itemData);
-//            } else
-//                $order->orderItems()->create($itemData);
-//        }
-//        $order->updatePrice($order['id']);
-//    }
+
 }

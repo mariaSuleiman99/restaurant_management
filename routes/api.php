@@ -115,6 +115,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/by-user', [OrderController::class, 'getUserOrders']); // Get orders by status
             Route::get('/{id}', [OrderController::class, 'show']); // Get a single order
             Route::put('/{id}', [OrderController::class, 'update']); // Update order status
+            Route::put('/submit-cart/{id}', [OrderController::class, 'submitCart']); // Update order status
             Route::get('/status/{status}', [OrderController::class, 'getOrdersByStatus']); // Get orders by status
             Route::get('/restaurant/{restaurantId}', [OrderController::class, 'byRestaurant']); // Get orders by status
         });

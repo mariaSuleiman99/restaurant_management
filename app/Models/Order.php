@@ -57,9 +57,8 @@ class Order extends Generic
     static function search(?array $filters): array
     {
         self::$mainQuery = self::query();
-
-        if (in_array('restaurant_id', $filters)) {
-            error_log('restaurant_id');
+        self::$mainQuery->where('status','<>','InCart');
+        if (array_key_exists('restaurant_id', $filters)) {
             $restaurantId = $filters['restaurant_id'];
             self::$mainQuery->whereHas('orderItems', function ($query) use ($restaurantId) {
                 $query->whereHas('item', function ($subQuery) use ($restaurantId) {
@@ -72,31 +71,5 @@ class Order extends Generic
         return $results;
     }
 
-    /**
-     * Calculate the total count of items in the order.
-     */
-    public function calculateTotalCount()
-    {
-        return $this->orderItems->sum('count');
-    }
 
-    /**
-     * Calculate the total price of the order.
-     */
-    public function calculateTotalPrice()
-    {
-        return $this->orderItems->sum(function ($item) {
-            return $item->count * $item->price;
-        });
-    }
-
-    /**
-     * Update the total_count and total_price in the database.
-     */
-    public function updateOrderTotals()
-    {
-        $this->count = $this->calculateTotalCount();
-        $this->total_price = $this->calculateTotalPrice();
-        $this->save();
-    }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Traits\WithReservationRestaurants;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
@@ -10,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class Reservations extends Generic
 {
-    use WithReservationRestaurants;
     protected $fillable = [
         'date', 'duration','user_id','table_id','start_time','end_time','status'
     ];

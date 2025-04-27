@@ -154,10 +154,10 @@ class RestaurantController extends Controller
             'restaurant_id' => $restaurantId
         ]);
         $user->assignRole($defaultRole);
-        $message = "Your Credentials are Username: " . $request['email'] . "\nPassword:" . $request['password'];
-        //   $this->notifyUser($message, $email_address);
+        $message = "Your Credentials are:\n\nUsername: " . $request['email'] . "\nPassword: " . $request['password'];
+        $message = nl2br($message); // Converts newlines into HTML <br> tags
         $details = [
-            'email' => $request['email'],
+            'email' => $email_address,
             'userName' => $request['name'],
             'message' => $message
         ];
